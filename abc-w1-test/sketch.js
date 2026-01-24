@@ -23,10 +23,11 @@ function touchMoved() {
     let organ = touchToOrgan[touches[i].id];
     let x = touches[i].x;
     let y = touches[i].y;
-    let dMax = dist(0, 0, width/2, height/2);
-    let d = dist(x, y, width/2, height/2);
-    let n = map(d, 0, dMax,5, 1);
-    textSize(min(width/3*n, height/3*n));
+    // let dMax = dist(0, 0, width/2, height/2);
+    // let d = dist(x, y, width/2, height/2);
+    // let n = map(d, 0, dMax,5, 1);
+    // textSize(min(width/3*n, height/3*n));
+    textSize(min(width/3, height/3));
     //textSize(width / touches.length);
     textAlign(CENTER, CENTER);
     text(organ,x,y);
