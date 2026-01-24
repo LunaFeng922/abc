@@ -1,5 +1,5 @@
 let organs = ["@", "^", "(", ")", "%", "$", "#", "&", "*"];
-let touchN = {};
+let touchToOrgan = {};
 
 function setup() {
   let canvas = createCanvas(windowWidth, windowHeight);
@@ -11,8 +11,8 @@ function draw() {}
 
 function touchStarted() {
   for (let i = 0; i < touches.length; i++) {
-    if (touchN[touches[i].id] == null) {
-    touchN[touches[i].id] = random(organs);
+    if (touchToOrgan[touches[i].id] == null) {
+    touchToOrgan[touches[i].id] = random(organs);
     }
   }
 }
@@ -23,7 +23,7 @@ function touchMoved() {
   //textSize(width / touches.length);
   textAlign(CENTER, CENTER);
   for (let i = 0; i < touches.length; i++) {
-    let organ = touchN[touches[i].id];
+    let organ = touchToOrgan[touches[i].id];
     let x = touches[i].x;
     let y = touches[i].y;
     text(organ,x,y);
