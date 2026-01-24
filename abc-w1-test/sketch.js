@@ -25,7 +25,7 @@ function touchMoved() {
     let y = touches[i].y;
     let dMax = dist(0, 0, width/2, height/2);
     let d = dist(x, y, width/2, height/2);
-    let n = map(d, 0, dMax, 3, 1);
+    let n = map(d, 0, dMax, 1, 3);
     textSize(min(width/3, height/3)/n);
     //textSize(width / touches.length);
     textAlign(CENTER, CENTER);
