@@ -19,13 +19,16 @@ function touchStarted() {
 
 function touchMoved() {
   background(255, 255, 190);
-  textSize(min(width/3, height/3));
-  //textSize(width / touches.length);
-  textAlign(CENTER, CENTER);
   for (let i = 0; i < touches.length; i++) {
     let organ = touchToOrgan[touches[i].id];
     let x = touches[i].x;
     let y = touches[i].y;
+    let dMax = dist(0, 0, width/2, height/2);
+    let d = dist(x, y, width/2, height/2);
+    let n = map(d, 0, DMax, 3, 1);
+    textSize(min(width/3, height/3)/n);
+    //textSize(width / touches.length);
+    textAlign(CENTER, CENTER);
     text(organ,x,y);
   }
   return false;
