@@ -19,7 +19,7 @@ function touchStarted() {
 
 function touchMoved() {
   background(255, 255, 190);
-  textSize(width/3);
+  textSize(min(width/3, height/3));
   //textSize(width / touches.length);
   textAlign(CENTER, CENTER);
   for (let i = 0; i < touches.length; i++) {
