@@ -1,0 +1,40 @@
+let organs = ["@", "^", "(", ")", "%", "$", "#", "&", "*"];
+let touchN = {};
+
+function setup() {
+  let canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent("p5-canvas-container");
+  background(255, 255, 190);
+}
+
+function draw() {}
+
+function touchStarted() {
+  for (let i = 0; i < touches.length; i++) {
+    if (touchN[touches[i].id] == null) {
+    touchN[touches[i].id] = random(organs);
+    }
+  }
+}
+
+function touchMoved() {
+  background(255, 255, 190);
+  textSize(width/3);
+  //textSize(width / touches.length);
+  textAlign(CENTER, CENTER);
+  for (let i = 0; i < touches.length; i++) {
+    let organ = touchN[touches[i].id];
+    let x = touches[i].x;
+    let y = touches[i].y;
+    text(organ,x,y);
+  }
+  return false;
+}
+
+function touchEnded() {
+background(255, 255, 190);
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
