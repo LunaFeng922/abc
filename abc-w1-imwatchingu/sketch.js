@@ -1,4 +1,4 @@
-let organs = ["@", "^", "(", ")", "%", "$", "#", "&", "*"];
+let organs = ["@", "^", "(", ")", "%", "$", "#", "&", "*", "<", ">", "?", "=", "+", "-", "~", ".", ";", ":"];
 //map from touch ID to organ symbol
 let touchToOrgan = {};
 
