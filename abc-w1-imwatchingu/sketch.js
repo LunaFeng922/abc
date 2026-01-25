@@ -41,3 +41,5 @@ background(255, 255, 190);
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
+
+// P5 touch events: https://p5js.org/reference/#Touch

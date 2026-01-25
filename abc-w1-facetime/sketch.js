@@ -48,3 +48,5 @@ function touchEnded() {
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
+
+// P5 touch events: https://p5js.org/reference/#Touch
