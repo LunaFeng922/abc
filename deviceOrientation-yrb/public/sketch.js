@@ -90,7 +90,7 @@ pop();
 //shifts
 if (abs(beta) > 40||abs(gamma) > 80){ 
   organ_2 = random(organs);
-  cr_bg = random(bgs);
+  // cr_bg = random(bgs);
   }
 
 let tx_2 = map(gamma, -90, 90, -width / 4, width / 4);
