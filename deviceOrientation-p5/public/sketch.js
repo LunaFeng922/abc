@@ -104,7 +104,7 @@ if (organ_1=="'"||organ_1=="$"||organ_1=="("||organ_1==")"||organ_1=="#"||organ_
   let tx2 = map(gamma, -90, 90, -width/4, width/4);
   let ty2 = map(betaMapped,  -90, 90,  height/2, -height/2);
 
-
+ //left eye
   push();
   translate(width/4 + tx2, height/2 + ty2);
 
@@ -127,7 +127,7 @@ if (organ_1=="'"||organ_1=="$"||organ_1=="("||organ_1==")"||organ_1=="#"||organ_
   text(organ_2, 0, 0);
   pop();
 
-  
+  //right eye
   push();
   translate(width*3/4 + tx2, height/2 + ty2);
 
