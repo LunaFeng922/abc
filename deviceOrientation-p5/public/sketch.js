@@ -28,91 +28,126 @@ if (
   fill(255,255,190);
 }
 
-//orientation info
+//orientation values
   push();
   textSize(10);
   text("alpha: " + round(alpha), 10, 30);
   text("beta: " + round(beta), 10, 40);
   text("gamma: " + round(gamma), 10, 50);
   pop();
-  
-//mouth or nose
 
-//shifts
-if (abs(beta) > 80||abs(gamma) > 40){ 
-  organ_1 = random(organs);
+  //map beta to -90~90
+  let betaMapped;
+
+  if (beta >= -90 && beta <= 90) {
+    betaMapped = beta;
+  } else if (beta > 90) {
+    betaMapped = 180 - beta;
+  } else {
+    betaMapped = -180 - beta;
   }
 
-let tx = map(gamma, -90, 90, -width / 2, width / 2);
-let ty = map(beta, -90, 90, -height / 4, height / 4);
+  //mouth / nose
 
-push();
-  translate(width / 2 + tx, height / 2 + ty);
-  rotate(radians(alpha));
-  //face which side
-  if (organ_1=="'"||organ_1=="$"||organ_1=="("||organ_1==")"||organ_1=="#"||organ_1=="?"||organ_1==";"||organ_1==":"){
-    rotate(-radians(90));
-      if(tx>0){
-      scale(1,-1);
-      }
-      else {
-      scale(1,1);
-      }
-  }
-  else {
-    if(tx>0){
-      scale(-1,1);
-    }
-    else {
-     scale(1,1);
-   }
-  }
-  //size
-    let d = dist(width / 2 + tx, height / 2 + ty, width/2, height/2);
-    let dMax = dist(0, 0, width/2, height/2);
-    let sizeN = map(d, 0, dMax, 0.3, 1);
-    textSize(width/2*sizeN);
-    textAlign(CENTER, CENTER);
-  text(organ_1,0,0);
-pop();
-
-//eyes
-
-//shifts
-if (abs(beta) > 40||abs(gamma) > 80){ 
-  organ_2 = random(organs);
-  cr_bg = random(bgs);
+  if (abs(gamma) > 40) {
+    organ_1 = random(organs);
   }
 
-let tx_2 = map(gamma, -90, 90, -width / 4, width / 4);
-let ty_2 = map(beta, 90, -90, -height / 2, height / 2);
+  let tx = map(gamma, -90, 90, -width/2, width/2);
+  let ty = map(betaMapped,  -90, 90, -height/4, height/4);
+
+  let sx, sy, r;
 
   push();
-  translate(width / 4 + tx_2, height / 2 + ty_2);
-  rotate(radians(gamma));
-    if(tx_2<0)
-    {scale(-1,1);}
-  else {
-    scale(1,1);
+  translate(width/2 + tx, height/2 + ty);
+
+  if (gamma <= 0 && betaMapped >= 0) {
+    sx = 1;  sy = 1;
+    r = -HALF_PI;
+    rotate(radians(alpha));
+  } else if (gamma > 0 && betaMapped > 0) {
+    sx = -1; sy = 1;
+    r = HALF_PI;
+    rotate(radians(alpha));
+  } else if (gamma> 0 && betaMapped < 0) {
+    sx = -1; sy = -1;
+    r = -HALF_PI;
+    rotate(radians(180 - alpha));
+  } else {
+    sx = 1;  sy = -1;
+    r = HALF_PI;
+    rotate(radians(180 - alpha));
   }
-      let ts_2=width/3+tx_2
-      textSize(ts_2);
-      textAlign(CENTER, CENTER);
-  text(organ_2,0,0);
+
+if (organ_1=="'"||organ_1=="$"||organ_1=="("||organ_1==")"||organ_1=="#"||organ_1=="?"||organ_1==";"||organ_1==":") {
+    rotate(r);
+  }
+
+  scale(sx, sy);
+
+  let d = dist(width/2 + tx, height/2 + ty, width/2, height/2);
+  let dMax = dist(0, 0, width/2, height/2);
+  let sizeN = map(d, 0, dMax, 0.3, 1);
+
+  textSize(width/2 * sizeN);
+  textAlign(CENTER, CENTER);
+  text(organ_1, 0, 0);
   pop();
 
-  push();
-  translate(width *3/4 + tx_2, height / 2 + ty_2);
-  rotate(radians(gamma));
-    if(tx_2<0)
-    {scale(-1,1);}
-  else {
-    scale(1,1);
+  //eyes
+
+  if (abs(betaMapped) > 75 && abs(betaMapped) < 105) {
+    organ_2 = random(organs);
+    cr_bg = random(bgs);
   }
-      let ts_3=width/3-tx_2
-      textSize(ts_3);
-      textAlign(CENTER, CENTER);
-  text(organ_2,0,0);
+
+  let tx2 = map(gamma, -90, 90, -width/4, width/4);
+  let ty2 = map(betaMapped,  -90, 90,  height/2, -height/2);
+
+
+  push();
+  translate(width/4 + tx2, height/2 + ty2);
+
+  if (gamma <= 0 && betaMapped >= 0) {
+    rotate(radians(gamma));
+    scale(1,1);
+  } else if (gamma > 0 && betaMapped > 0) {
+    rotate(radians(gamma));
+    scale(-1,1);
+  } else if (gamma > 0 && betaMapped < 0) {
+    rotate(radians(-gamma));
+    scale(-1,-1);
+  } else {
+    rotate(radians(-gamma));
+    scale(1,-1);
+  }
+
+  textSize(width/3 + tx2);
+  textAlign(CENTER, CENTER);
+  text(organ_2, 0, 0);
+  pop();
+
+  
+  push();
+  translate(width*3/4 + tx2, height/2 + ty2);
+
+  if (gamma <= 0 && betaMapped >= 0) {
+    rotate(radians(gamma));
+    scale(1,1);
+  } else if (gamma > 0 && betaMapped > 0) {
+    rotate(radians(gamma));
+    scale(-1,1);
+  } else if (gamma > 0 && betaMapped < 0) {
+    rotate(radians(-gamma));
+    scale(-1,-1);
+  } else {
+    rotate(radians(-gamma));
+    scale(1,-1);
+  }
+
+  textSize(width/3 - tx2);
+  textAlign(CENTER, CENTER);
+  text(organ_2, 0, 0);
   pop();
 }
 
