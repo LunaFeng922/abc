@@ -8,15 +8,9 @@ Hi! This project is a chat room visualizes the evolving "chat path" between you 
 
 2. **Install and run**
    Open terminal
-```bash
-   cd project
-```
-```bash
-   npm install
-```
-```bash
-   node server.js
-```
+` cd project`
+` npm install`
+`node server.js`
 
    Note the HTTPS server port number from the output.
 
