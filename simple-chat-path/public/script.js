@@ -87,7 +87,7 @@ socket.on("messageFromServer", function(msgData){
 
 // APPEND MESSAGES TO BOX
 function appendMessage(data){  
-    // Detect message type and update padding in one step
+    // Detect message type and update padding
     const newPaddingH = detectAndUpdatePadding(data.message);
 
     // Create new list item (li)
