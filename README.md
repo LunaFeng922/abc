@@ -1,6 +1,6 @@
 # ABC Browser Circus
 
-Hi, I am luna...
+Hi, I am luna.
 
 Find my abc projects below:
 - w1
