@@ -1,6 +1,6 @@
 ## Chat Path
 
-Hi! This project is a chat room visualizes the evolving "chat path" between you and the people you're chatting with —- a "chatting-visualization" of your relationships.
+Hi! This project is a chat room visualizes the evolving "chat path" between you and the people you're chatting with.
 
 ### Installation & Setup
 
@@ -13,7 +13,7 @@ Hi! This project is a chat room visualizes the evolving "chat path" between you 
     - `node server.js`
     - Note the HTTPS server port number from the output.
 
-3. **Access the application**
+3. **Access the app**
     - Find your local network IP address
     - Navigate to: `https://your-ip-address:port-number`
 
