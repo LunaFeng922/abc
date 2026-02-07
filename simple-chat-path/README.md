@@ -1,20 +1,23 @@
 ## Chat Path
 
-Hi! This project is a chat room visualizes the evolving "chat path" between you and the people you're chatting with —- a chatting-visualization of your relationships.
+Hi! This project is a chat room visualizes the evolving "chat path" between you and the people you're chatting with —- a "chatting-visualization" of your relationships.
 
 ### Installation & Setup
 
 1. **Clone the repository**
-```bash
-   git clone 
-```
 
 2. **Install and run**
+   Open terminal
 ```bash
    cd project
+```
+```bash
    npm install
+```
+```bash
    node server.js
 ```
+
    Note the HTTPS server port number from the output.
 
 3. **Access the application**
