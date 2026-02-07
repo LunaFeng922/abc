@@ -7,11 +7,11 @@ Hi! This project is a chat room visualizes the evolving "chat path" between you 
 1. **Clone the repository**
 
 2. **Install and run**
-   Open terminal
+   - Open terminal
     - ` cd project`
     - ` npm install`
     - `node server.js`
-   Note the HTTPS server port number from the output.
+   - Note the HTTPS server port number from the output.
 
 3. **Access the application**
    - Find your local network IP address
