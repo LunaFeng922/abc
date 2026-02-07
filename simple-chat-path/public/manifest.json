@@ -2,7 +2,7 @@
   "name": "chat path",
   "icons": [
     {
-      "src": "assets/chat-path.png",
+      "src": "assets/512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
