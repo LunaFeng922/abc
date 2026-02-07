@@ -1,0 +1,12 @@
+{
+  "name": "chat path",
+  "icons": [
+    {
+      "src": "assets/chat-path.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "orientation": "Natural",
+  "display": "standalone"
+}
