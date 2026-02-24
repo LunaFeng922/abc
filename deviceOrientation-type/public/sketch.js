@@ -77,7 +77,7 @@ function draw() {
     betaMapped = -180 - beta;
   }
 
-  if (betaMapped < -50) {
+  if (betaMapped >60) {
     userText = "";
     inputElement.value("");
   }
@@ -88,7 +88,7 @@ function draw() {
     lastFont = millis();
   }
 
-  if (betaMapped > 20 && millis() - lastSize > 100) {
+  if (betaMapped <- 20 && millis() - lastSize > 100) {
     currentSizeIdx = (currentSizeIdx + 1) % fontSizes.length;
     lastSize = millis();
   }
@@ -126,6 +126,21 @@ function draw() {
   let totalWidth = totalCols * colWidth;
   let startX = totalWidth / 2 - colWidth / 2;
   let startY = -(min(userText.length, maxRows) * lineHeight) / 2;
+  
+// for (let i = 0; i < userText.length; i++) {
+//   let col = floor(i / maxRows);
+//   let row = i % maxRows;
+//   let x = startX - col * colWidth;
+
+//   let charsInThisCol = min(userText.length - col * maxRows, maxRows);
+//   let y = startY + (charsInThisCol - 1 - row) * lineHeight;
+
+//   push();
+//   translate(x, y + lineHeight / 2);
+//   rotate(radians(gamma));
+//   text(userText[i], 0, -lineHeight / 2);
+//   pop();
+// }
 
   for (let i = 0; i < userText.length; i++) {
     let col = floor(i / maxRows);
@@ -139,6 +154,7 @@ function draw() {
     text(userText[i], 0, -lineHeight / 2);
     pop();
   }
+
 
   pop();
 }
