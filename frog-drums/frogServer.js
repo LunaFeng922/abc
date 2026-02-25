@@ -48,9 +48,12 @@ io.on('connection', (socket) => {
                 frogIdx: data.frogIdx,
                 //drumming: false
             }
-                    //     inform conductor of new frog
             frogs.push(frogData);
             console.log(frogs)
+                    //     inform conductor of new frog
+                    if(conductor!= undefined){
+                        io.to(conductor).emit("new-frog", frogData); // send new frog data to conductor
+                    }
         } else if (data.role == "conductor"){
         // if conductor:
         //     store conductor socket id to conductor global variable
@@ -62,14 +65,15 @@ io.on('connection', (socket) => {
 
     // always comes from conductor
     // listen to frogs being triggered
-
+socket.on("trigger-frog", function(frogID){
         // check if frog exists
+        
         // option A: tell taht frog to make sounds
+        io.to(frogID).emit("make-sound");
+
         // option B: chck if the frog currently makes sounds
         //      either tell them to start or stop
-
-
-
+})
 
 
     
@@ -96,15 +100,17 @@ io.on('connection', (socket) => {
         }
         console.log(frogs);
             // delete frog
-        // if it's a cnductpr
+        // if it's a conductor
             // delete conductor
-
-
-        // if the condiuctr is still online
-        // tell them which frg has been deleted
-
+        if(socket.id == conductor){
+            conductor = undefined;
+        }
+        // if the conductor is still online
+        // tell them which frog has been deleted
+        if (conductor != undefined){
+        io.to(conductor).emit("delete-frog", socket.id);
+        }
     })
-
 })
 
 

@@ -29,7 +29,9 @@ readyButton.addEventListener("click", function(){
 
 
     // listen to server socket messages and play sound in accordance
-
+    socket.on('make-sound', function(){
+        audioElm.play();
+    })
     
    
     // TESTING IF JS CAN PLAY THE AUDIO:
@@ -49,7 +51,7 @@ window.addEventListener("load", function(){
     audioElm.controls = true;
     audioElm.id = "frogSound";
     audioElm.innerHTML = `
-        <source src="sounds/d`+frogIdx+`.wav" type="audio/mpeg">
+        <source src="sounds/f`+frogIdx+`.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     `
 

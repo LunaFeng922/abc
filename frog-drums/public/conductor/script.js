@@ -20,15 +20,30 @@ socket.emit("my-role", {role: "conductor"});
 socket.on("frogs-already-online", function(data){
     console.log("frogs already online", data);
     //loop over existing frogs, put them onto the page
+    for(let i = 0; i < data.length; i++){
+        let frog = data[i];
+        addFrog(frog.id, frog.frogIdx);
+    }
 })
 
 // handle new frog
-
+socket.on("new-frog", function(frog){
+  addFrog(frog.id, frog.frogIdx);
+})
 
 // handle deleting frogs
+socket.on("delete-frog", function(frogID){
+    console.log(frogID,"disconnects");
+    //find div with the frogID as its ID
+    //delete that div
+    let frogDiv = document.querySelector("#A"+frogID);//find the div with the frogID as its ID
+    if(frogDiv){
+        frogDiv.remove();
+    }
+})
 
 
-addFrog("sdfobjweq", 0); // function test
+//addFrog("sdfobjweq", 0); // function test
 
 function addFrog(socketID, frogIdx){
     let imgWrapper = document.createElement("div");
@@ -50,8 +65,10 @@ function addFrog(socketID, frogIdx){
             document.querySelector("#A"+socketID).style.opacity = 0.3;
         }
 
+        console.log("clicked", socketID);
 
-        // tell server we pressed the frig
+        // tell server we pressed the frog
+        socket.emit("trigger-frog", socketID);
 
     })
 }
