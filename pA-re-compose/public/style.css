@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  /* outline: 1px solid black; */
+}
+
+body {
+  background: #ffffff;
+  color: #000000;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden; 
+}
+
+#title {
+  display: flex;
+  font-size: clamp(16px, 4vw, 24px);
+  margin-bottom: 16px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: #000000;
+  font-family: Arial, sans-serif;
+  font-style: italic;
+  justify-content: center;
+}
+
+#instructions {
+  display: flex;
+  font-size: clamp(12px, 3vw, 20px);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: #aaa;
+  font-family: Arial, sans-serif;
+  font-style: italic;
+  justify-content: center;
+}
+
+#sentence-wrapper {
+  padding: 30px;
+  max-width: 90vw;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#sentence {
+  font-size: clamp(16px, 4vw, 24px);
+  font-weight: 100;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+#sentence .para {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+
+#sentence .indent {
+  width: 2em;
+  flex-shrink: 0;
+}
+
+#sentence span {
+  cursor: pointer;
+  user-select: none;
+  -webkit-touch-callout: none;
+  position: relative;
+}
+
+#sentence span.version-index-badge {
+  position: absolute;
+  font-size: 8px;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  color: #aaa;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+#sentence span.selected-word {
+  border: 1px solid black;
+  border-radius: 0px;
+}
+
+#sentence span.non-editable {
+  pointer-events: none;
+}
+
+#edit-inputBox {
+  position: absolute;;
+  z-index: 999;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+#edit-inputBox.hidden {
+  display: none;
+}
+
+#edit-input {
+  font-size: clamp(16px, 4vw, 24px);
+  font-weight: 100;
+  
+  /* background: white; */
+  /* border: 1px solid black; */
+  /* color: black;
+  caret-color: black; */
+
+  border-radius: 0px;
+  outline: none;
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+
+.input-sizer {
+  position: fixed;
+  visibility: hidden;
+  pointer-events: none;
+
+  white-space: pre;
+
+  font-size: clamp(16px, 4vw, 24px);
+  font-weight: 100;
+  font-family: inherit;
+
+  padding: 0;
+  border: 0;
+}

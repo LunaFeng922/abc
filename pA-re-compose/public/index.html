@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+<link rel="manifest" href="manifest.json" />
+<title>re-compose</title>
+<link rel="stylesheet" href="style.css">
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  
+<div id="sentence-wrapper">
+  <div id="title">
+    <span>Re-compose</span>
+  </div>
+  <div id="instructions">
+    <span>Short tap to flip || Long tap to edit</span>
+  </div>
+  <div id="sentence"></div>
+</div>
+<div id="edit-inputBox" class="hidden">
+  <input id="edit-input"/>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
