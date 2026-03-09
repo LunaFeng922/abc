@@ -25,6 +25,8 @@ body {
   font-family: Arial, sans-serif;
   font-style: italic;
   justify-content: center;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 #instructions {
@@ -36,6 +38,8 @@ body {
   font-family: Arial, sans-serif;
   font-style: italic;
   justify-content: center;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 #sentence-wrapper {
