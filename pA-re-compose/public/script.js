@@ -232,6 +232,8 @@ function renderText() {
 
 //touch events
 sentence.addEventListener("touchstart", (e) => {
+   flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
+  flipSound.play();
   const span = e.target;
   if (!span.dataset.index) return; // not a word, ignore
 
@@ -277,8 +279,8 @@ sentence.addEventListener("touchstart", (e) => {
 
 sentence.addEventListener("touchend", (e) => {
   if (touchTimer === null) return; // timer already fired (long press completed), ignore touchend
-  flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
-  flipSound.play();
+  // flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
+  // flipSound.play();
   // finger lifted before 500ms: confirmed short tap → cancel the long press timer
   clearTimeout(touchTimer);
   touchTimer = null;
