@@ -231,7 +231,8 @@ function renderText() {
 }
 
 //touch events
-document.body("click", function(){
+document.body.addEventListener("click", function(){
+  console.log("body")
   flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
   flipSound.play();
 })
