@@ -231,9 +231,13 @@ function renderText() {
 }
 
 //touch events
-sentence.addEventListener("touchstart", (e) => {
-   flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
+document.body("click", function(){
+  flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
   flipSound.play();
+})
+sentence.addEventListener("touchstart", (e) => {
+  //  flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
+  // flipSound.play();
   const span = e.target;
   if (!span.dataset.index) return; // not a word, ignore
 
