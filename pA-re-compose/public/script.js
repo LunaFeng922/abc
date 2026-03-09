@@ -21,7 +21,8 @@ const input     = document.getElementById("edit-input");
 
 const inputSizer = createSizer();
 
-const flipSound = new Audio("assets/flip.wav");
+// const flipSound = new Audio("assets/flip.wav");
+const flipSound = document.querySelector("#flipSound");
 
 function createPara() {
   const p = document.createElement("p");
