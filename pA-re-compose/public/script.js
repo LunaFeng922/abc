@@ -23,6 +23,11 @@ const inputSizer = createSizer();
 
 const flipSound = new Audio("assets/flip.wav");
 
+function playFlip() {
+  flipSound.currentTime = 0;
+  flipSound.play().catch(() => {});
+}
+
 function createPara() {
   const p = document.createElement("p");
   p.classList.add("para");
@@ -155,8 +160,7 @@ socket.on("current-text", (data) => {
 
 socket.on("word-looped", (data) => {
   currentVer[data.index] = data.versionIdx;
-  flipSound.currentTime = 0;
-  flipSound.play();
+  playFlip();
   renderText();
 });
 
@@ -292,8 +296,7 @@ sentence.addEventListener("touchend", (e) => {
   currentVer[index] = (currentVer[index] + 1) % text[index].length; // loop back to 0 after last version
   socket.emit("word-looped", { index, versionIdx: currentVer[index] }); // tell others which version this word is now on
 
-  flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
-  flipSound.play();
+  playFlip();
   renderText();
 });
 
