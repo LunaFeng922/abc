@@ -23,23 +23,6 @@ const inputSizer = createSizer();
 
 const flipSound = new Audio("assets/flip.wav");
 
-// Unlock audio on first touch (fixes mobile audio delay)
-let audioUnlocked = false;
-
-function unlockAudio() {
-  if (audioUnlocked) return;
-  audioUnlocked = true;
-
-  flipSound.play().then(() => {
-    flipSound.pause();
-    flipSound.currentTime = 0;
-  }).catch(() => {});
-
-  document.removeEventListener("touchstart", unlockAudio);
-}
-
-document.addEventListener("touchstart", unlockAudio);
-
 function playFlip() {
   flipSound.currentTime = 0;
   flipSound.play().catch(() => {});
