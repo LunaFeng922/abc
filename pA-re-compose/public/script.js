@@ -276,7 +276,8 @@ sentence.addEventListener("touchstart", (e) => {
 
 sentence.addEventListener("touchend", (e) => {
   if (touchTimer === null) return; // timer already fired (long press completed), ignore touchend
-
+  flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
+  flipSound.play();
   // finger lifted before 500ms: confirmed short tap → cancel the long press timer
   clearTimeout(touchTimer);
   touchTimer = null;
@@ -292,8 +293,7 @@ sentence.addEventListener("touchend", (e) => {
   currentVer[index] = (currentVer[index] + 1) % text[index].length; // loop back to 0 after last version
   socket.emit("word-looped", { index, versionIdx: currentVer[index] }); // tell others which version this word is now on
 
-  flipSound.currentTime = 0; // reset so it can replay immediately on fast taps
-  flipSound.play();
+  
   renderText();
 });
 
