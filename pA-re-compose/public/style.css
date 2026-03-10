@@ -77,6 +77,9 @@ body {
 
 #sentence span.version-index-badge {
   position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateY(-100%);
   font-size: 8px;
   font-family: Arial, sans-serif;
   font-style: normal;
