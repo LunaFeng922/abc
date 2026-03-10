@@ -49,7 +49,7 @@ body {
 #sentence {
   font-size: clamp(16px, 4vw, 24px);
   font-weight: 100;
-  line-height: 1.6;
+  line-height: 1.2;
   display: flex;
   flex-direction: column;
   gap: 16px;
