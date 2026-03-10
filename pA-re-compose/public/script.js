@@ -227,16 +227,6 @@ function renderText() {
   if (editingIndex !== null) updateInputPos();
 }
 
-// helper: cancel current editing word and notify others
-function cancelEditing() {
-  const idx = editingIndex;
-  editingIndex = null;
-  inputBox.classList.add("hidden");
-  socket.emit("cancel-input", { index: idx });
-  delete selectedWords[idx];
-  renderText();
-}
-
 //touch events
 sentence.addEventListener("touchstart", (e) => {
   const span = e.target;
@@ -245,7 +235,12 @@ sentence.addEventListener("touchstart", (e) => {
   if (editingIndex !== null) {
     const touchedIndex = span.dataset.index !== undefined ? Number(span.dataset.index) : null;
     if (touchedIndex !== editingIndex) {
-      cancelEditing();
+        const idx = editingIndex;
+        editingIndex = null;
+        inputBox.classList.add("hidden");
+        socket.emit("cancel-input", { index: idx });
+        delete selectedWords[idx];
+        renderText();
       return; // don't process this touch further
     }
   }

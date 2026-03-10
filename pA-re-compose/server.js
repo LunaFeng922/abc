@@ -52,7 +52,7 @@ const colorPairs = [
   { font: "#fffb00", bg: "#002668" },
   { font: "#2b00ff", bg: "#26e6ff" },
   { font: "#46004b", bg: "#92ffb8" },
-  { font: "#ffaacc", bg: "#b5ffb8" },
+  { font: "#bbf7fe", bg: "#431a00" },
   { font: "#ff561d", bg: "#d3fb8e" },
   { font: "#c1e08f", bg: "#250012" }
 ];
