@@ -21,7 +21,7 @@ const input     = document.getElementById("edit-input");
 
 const inputSizer = createSizer();
 
-const flipSound = new Audio("assets/flip.wav");
+const flipSound = new Audio("assets/tink.wav");
 
 function playFlip() {
   flipSound.currentTime = 0;
