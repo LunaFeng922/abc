@@ -45,11 +45,10 @@ function createBadge(current, total) {
   return badge;
 }
 
-//create a span element for a word (later to be retrived in renderText function)
 function createWordSpan({ index, word, isSelected }) {
   const el = document.createElement("span");
-  el.dataset.index = index;//which word in the dataset
-  el.innerText = word.text;//the text of the word
+  el.dataset.index = index;
+  el.innerText = word.text;
 
   setFontStyle(el, word.font);
 
@@ -64,7 +63,6 @@ function createWordSpan({ index, word, isSelected }) {
   return el;
 }
 
-//set the font style
 function setFontStyle(el, font) {
   if (!font || font.family === "inherit") return;
 
@@ -83,7 +81,6 @@ function setFontStyle(el, font) {
   el.style.fontWeight = "normal";}
 }
 
-//create a hidden sizer element to calculate the width of input text for auto-resizing the input box
 function createSizer() {
   const el = document.createElement("span");
   el.className = "input-sizer";
@@ -91,24 +88,21 @@ function createSizer() {
   return el;
 }
 
-//resize the input box width based on the input text width
 function resizeInput() {
-  setFontStyle(inputSizer, myFont);// match inputSizer's font to input box font, so the width measurement is accurate
+  setFontStyle(inputSizer, myFont);
   inputSizer.textContent = input.value || " ";
   inputBox.style.width = `${inputSizer.offsetWidth + 5}px`;
 }
 
-//update the position of input box to make it always below the word being edited
 function updateInputPos() {
   if (editingIndex === null) return;
-  const span = document.querySelector(`[data-index="${editingIndex}"]`);//find the span of the word being edited
+  const span = document.querySelector(`[data-index="${editingIndex}"]`);
   if (!span) return;
   const rect = span.getBoundingClientRect();
-  inputBox.style.left = rect.left + rect.width / 2 + window.scrollX + "px";//css: transform: translateX(-50%);
+  inputBox.style.left = rect.left + rect.width / 2 + window.scrollX + "px";
   inputBox.style.top  = rect.bottom + window.scrollY + "px";
 }
 
-//handling datas of words (later to be retrived in renderText function)
 function resolveWord(index, versions) {
   if (index === editingIndex) {
     const original = versions[currentVer[index]];
@@ -233,9 +227,29 @@ function renderText() {
   if (editingIndex !== null) updateInputPos();
 }
 
+// helper: cancel current editing word and notify others
+function cancelEditing() {
+  const idx = editingIndex;
+  editingIndex = null;
+  inputBox.classList.add("hidden");
+  socket.emit("cancel-input", { index: idx });
+  delete selectedWords[idx];
+  renderText();
+}
+
 //touch events
 sentence.addEventListener("touchstart", (e) => {
   const span = e.target;
+
+  // if currently editing a word and touching elsewhere, cancel it
+  if (editingIndex !== null) {
+    const touchedIndex = span.dataset.index !== undefined ? Number(span.dataset.index) : null;
+    if (touchedIndex !== editingIndex) {
+      cancelEditing();
+      return; // don't process this touch further
+    }
+  }
+
   if (!span.dataset.index) return; // not a word, ignore
 
   touchingIndex = Number(span.dataset.index); // which word was touched
@@ -338,9 +352,7 @@ input.addEventListener("keydown", (e) => {
   }
 });
 
-// when input box loses focus, also finish or cancel the input (emm it actually doesn't work in all situations)
 input.addEventListener("blur", () => {
-
   if (editingIndex === null) return;
 
   const idx    = editingIndex;
