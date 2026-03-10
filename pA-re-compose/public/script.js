@@ -227,63 +227,63 @@ function renderText() {
   if (editingIndex !== null) updateInputPos();
 }
 
-//touch events
-sentence.addEventListener("touchstart", (e) => {
-  const span = e.target;
+// helper: cancel current editing word and notify others
+function cancelEditing() {
+  const idx = editingIndex;
+  editingIndex = null;
+  inputBox.classList.add("hidden");
+  socket.emit("cancel-input", { index: idx });
+  delete selectedWords[idx];
+  renderText();
+}
 
-  // if currently editing a word and touching elsewhere, cancel it
-  if (editingIndex !== null) {
-    const touchedIndex = span.dataset.index !== undefined ? Number(span.dataset.index) : null;
-    if (touchedIndex !== editingIndex) {
-        const idx = editingIndex;
-        editingIndex = null;
-        inputBox.classList.add("hidden");
-        socket.emit("cancel-input", { index: idx });
-        delete selectedWords[idx];
-        renderText();
-      return; // don't process this touch further
-    }
+const sentenceWrapper = document.getElementById("sentence-wrapper");
+const inputBoxEl = document.getElementById("edit-inputBox");
+
+// touch events
+sentenceWrapper.addEventListener("touchstart", (e) => {
+  const span = e.target;
+  const touchedIndex = span.dataset?.index !== undefined ? Number(span.dataset.index) : null;
+
+  // any touch outside the word being edited → cancel editing
+  // (but not if touching the input box itself)
+  if (editingIndex !== null && touchedIndex !== editingIndex && !inputBoxEl.contains(span)) {
+    cancelEditing();
+    return;
   }
 
-  if (!span.dataset.index) return; // not a word, ignore
+  // only process touches on word spans inside the sentence
+  if (!sentence.contains(span) || touchedIndex === null) return;
 
-  touchingIndex = Number(span.dataset.index); // which word was touched
-  const currentWord = text[touchingIndex][currentVer[touchingIndex]]; // get current version of the word
-  if (!currentWord.editable) return; // word is not editable, ignore
+  const currentWord = text[touchedIndex][currentVer[touchedIndex]];
+  if (!currentWord.editable) return; // non-editable word, ignore
 
-  const indexSelected = touchingIndex; // lock the index in a local variable, because touchingIndex may change in 500ms
+  touchingIndex = touchedIndex;
+  const indexSelected = touchedIndex; // lock before the async timer fires
 
-  // we don't know yet if this is a short tap or a long press, start the timer and wait
+  // start timer: short tap → loop, long press → edit
   touchTimer = setTimeout(() => {
     // 500ms passed, finger still down: confirmed long press → enter edit mode
 
     if (selectedWords[indexSelected]) return; // word already taken by someone else, ignore
 
-    // if another word is being edited, cancel it first, only one word can be edited at a time
-    if (editingIndex !== null && editingIndex !== indexSelected) {
-      socket.emit("cancel-input", { index: editingIndex });
-      delete selectedWords[editingIndex];
-      renderText();
-    }
+    editingIndex = indexSelected;
+    selectedWords[indexSelected] = "mine";
+    input.value = "";
 
-    editingIndex = indexSelected; // mark this word as being edited
-    selectedWords[indexSelected] = "mine"; // mark as selected by me, not others
-    input.value = ""; // clear the input box
-
-    // measure the original word width so the input box starts at the right size
+    // size the input box to match the original word
     const originalWord = text[indexSelected][currentVer[indexSelected]];
     setFontStyle(inputSizer, myFont);
     inputSizer.textContent = originalWord.text;
     inputBox.style.width = `${inputSizer.offsetWidth + 5}px`;
 
-    inputBox.classList.remove("hidden"); // show the input box
-    updateInputPos(); // position it under the word
-    input.focus(); // focus so the keyboard pops up
+    inputBox.classList.remove("hidden");
+    updateInputPos();
+    input.focus();
 
-    // intent confirmed: long press → tell others this word is taken
     socket.emit("word-selected", { index: indexSelected });
     renderText();
-    touchTimer = null; // timer has fired, clear the handle
+    touchTimer = null;
   }, 500);
 });
 
