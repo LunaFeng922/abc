@@ -1,8 +1,8 @@
 let GPS_GRANTED = false;
 let GPS_options = {
     enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 10000,
+    timeout: 10000,
+    maximumAge: 0,        // never use cached position — always acquire a fresh fix
   };
 
 function requestGPS() {
@@ -33,6 +33,40 @@ function requestGPS() {
 
 function report(state) {
   console.log(`Permission ${state}`);
+}
+
+function requestOrientation() {
+  const setup = () => {
+    // iOS: webkitCompassHeading via deviceorientation
+    window.addEventListener("deviceorientation", (e) => {
+      if (e.webkitCompassHeading != null) {
+        myHeading = e.webkitCompassHeading;
+      }
+    });
+    // Android: deviceorientationabsolute (true north)
+    window.addEventListener("deviceorientationabsolute", (e) => {
+      if (e.alpha != null) {
+        myHeading = (360 - e.alpha) % 360;
+      }
+    });
+    console.log("Device orientation listeners added");
+  };
+
+  if (
+    typeof DeviceOrientationEvent !== "undefined" &&
+    typeof DeviceOrientationEvent.requestPermission === "function"
+  ) {
+    // iOS 13+ requires explicit permission from a user gesture
+    DeviceOrientationEvent.requestPermission()
+      .then((state) => {
+        console.log("DeviceOrientation permission:", state);
+        if (state === "granted") setup();
+      })
+      .catch(console.error);
+  } else {
+    // Android / desktop — no permission needed
+    setup();
+  }
 }
 
 
