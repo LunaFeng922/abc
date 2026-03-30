@@ -45,8 +45,9 @@ let mappa_options = {
   lat: 0,
   lng: 0,
   zoom: zoom,
-  style:
-    "https://webrd01.is.autonavi.com/appmaptile?lang=zhCn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
+  //style: "https://b.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png", 
+  style: "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
+  //style: 'https://webst01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=6&x={x}&y={y}&z={z}',
 };
 
 
@@ -434,17 +435,17 @@ class ImageData {
     push();
     imageMode(CENTER);
     image(this.img, this.x, this.y, this.w, this.h);
-    // // Scalp ellipse overlay
-    // let cx = this.x + headCx * this.w;
-    // let cy = this.y + headCy * this.h;
-    // push();
-    // translate(cx, cy);
-    // rotate(tilt);
-    // noFill();
-    // stroke("red");
-    // strokeWeight(2);
-    // ellipse(0, 0, ellipseRx * 2 * this.w, ellipseRy * 2 * this.h);
-    // pop();
+    // Scalp ellipse overlay
+    let cx = this.x + headCx * this.w;
+    let cy = this.y + headCy * this.h;
+    push();
+    translate(cx, cy);
+    rotate(tilt);
+    fill(0,50);
+    stroke(0,60);
+    strokeWeight(2);
+    ellipse(0, 0, ellipseRx * 2 * this.w, ellipseRy * 2 * this.h);
+    pop();
     pop();
   }
 }
