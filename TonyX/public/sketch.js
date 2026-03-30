@@ -1,7 +1,7 @@
-const head_cx = 0.2;
-const head_cy = -0.38;
-const ellipse_rx = 0.17;
-const ellipse_ry = 0.11;
+const headCx = 0.2;
+const headCy = -0.38;
+const ellipseRx = 0.17;
+const ellipseRy = 0.11;
 const tilt = 0.5;
 const size = 300;
 const zoom = 16;
@@ -46,7 +46,7 @@ let mappa_options = {
   lng: 0,
   zoom: zoom,
   style:
-    "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
+    "https://webrd01.is.autonavi.com/appmaptile?lang=zhCn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
 };
 
 
@@ -435,15 +435,15 @@ class ImageData {
     imageMode(CENTER);
     image(this.img, this.x, this.y, this.w, this.h);
     // // Scalp ellipse overlay
-    // let cx = this.x + head_cx * this.w;
-    // let cy = this.y + head_cy * this.h;
+    // let cx = this.x + headCx * this.w;
+    // let cy = this.y + headCy * this.h;
     // push();
     // translate(cx, cy);
     // rotate(tilt);
     // noFill();
     // stroke("red");
     // strokeWeight(2);
-    // ellipse(0, 0, ellipse_rx * 2 * this.w, ellipse_ry * 2 * this.h);
+    // ellipse(0, 0, ellipseRx * 2 * this.w, ellipseRy * 2 * this.h);
     // pop();
     pop();
   }

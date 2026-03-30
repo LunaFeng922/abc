@@ -17,10 +17,10 @@ const PORT = 4240;
 const COLOR = "#000000";
 
 //head area for hair growing
-const head_cx = 0.2;
-const head_cy = -0.38;
-const ellipse_rx = 0.17;
-const ellipse_ry = 0.11;
+const headCx = 0.2;
+const headCy = -0.38;
+const ellipseRx = 0.17;
+const ellipseRy = 0.11;
 const tilt = 0.5;
 const size = 300;
 const imgBuf = fs.readFileSync("public/assets/JingWu01.png");
@@ -29,16 +29,16 @@ const imgAsp = imgBuf.readUInt32BE(20) / imgBuf.readUInt32BE(16);
 function randomHeadOffset() {
   let angle = Math.random() * Math.PI * 2;
   let r = Math.sqrt(Math.random());
-  let ex = ellipse_rx * r * Math.cos(angle);
-  let ey = ellipse_ry * r * Math.sin(angle);
+  let ex = ellipseRx * r * Math.cos(angle);
+  let ey = ellipseRy * r * Math.sin(angle);
 
   let pxX = ex * size;
   let pxY = ey * size * imgAsp;
   let rx = pxX * Math.cos(tilt) - pxY * Math.sin(tilt);
   let ry = pxX * Math.sin(tilt) + pxY * Math.cos(tilt);
   return {
-    headOffsetX: head_cx * size + rx,
-    headOffsetY: head_cy * size * imgAsp + ry,
+    headOffsetX: headCx * size + rx,
+    headOffsetY: headCy * size * imgAsp + ry,
   };
 }
 
