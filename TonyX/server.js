@@ -1,5 +1,3 @@
-// GPS HAIR PROJECT — server.js
-
 const express = require("express");
 const https = require("https");
 const fs = require("fs");
@@ -18,30 +16,29 @@ const io = new Server(HTTPSserver);
 const PORT = 4240;
 const COLOR = "#000000";
 
-// Scalp ellipse parameters — must match sketch.js
-const HEAD_CX = 0.2;
-const HEAD_CY = -0.38;
-const ELLIPSE_RX = 0.17;
-const ELLIPSE_RY = 0.11;
-const TILT = 0.5;
-const INIT_SIZE = 300;
+//head area for hair growing
+const head_cx = 0.2;
+const head_cy = -0.38;
+const ellipse_rx = 0.17;
+const ellipse_ry = 0.11;
+const tilt = 0.5;
+const size = 300;
 const imgBuf = fs.readFileSync("public/assets/JingWu01.png");
-const IMG_ASPECT = imgBuf.readUInt32BE(20) / imgBuf.readUInt32BE(16);
+const imgAsp = imgBuf.readUInt32BE(20) / imgBuf.readUInt32BE(16);
 
-// Place the hair root at a random point within the scalp ellipse
 function randomHeadOffset() {
   let angle = Math.random() * Math.PI * 2;
   let r = Math.sqrt(Math.random());
-  let ex = ELLIPSE_RX * r * Math.cos(angle);
-  let ey = ELLIPSE_RY * r * Math.sin(angle);
-  // Rotate in pixel space where Y is scaled by aspect ratio
-  let pxX = ex * INIT_SIZE;
-  let pxY = ey * INIT_SIZE * IMG_ASPECT;
-  let rx = pxX * Math.cos(TILT) - pxY * Math.sin(TILT);
-  let ry = pxX * Math.sin(TILT) + pxY * Math.cos(TILT);
+  let ex = ellipse_rx * r * Math.cos(angle);
+  let ey = ellipse_ry * r * Math.sin(angle);
+
+  let pxX = ex * size;
+  let pxY = ey * size * imgAsp;
+  let rx = pxX * Math.cos(tilt) - pxY * Math.sin(tilt);
+  let ry = pxX * Math.sin(tilt) + pxY * Math.cos(tilt);
   return {
-    headOffsetX: HEAD_CX * INIT_SIZE + rx,
-    headOffsetY: HEAD_CY * INIT_SIZE * IMG_ASPECT + ry,
+    headOffsetX: head_cx * size + rx,
+    headOffsetY: head_cy * size * imgAsp + ry,
   };
 }
 
@@ -50,9 +47,7 @@ let persistedTraces = {};
 let globalOriginLat = null;
 let globalOriginLon = null;
 
-// -------------------------------------------------------------
-//  SOCKET EVENTS
-// -------------------------------------------------------------
+// socket events
 io.on("connection", (socket) => {
   console.log("connected", socket.id);
 
