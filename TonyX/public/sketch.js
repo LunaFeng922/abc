@@ -34,10 +34,10 @@ let mySocketID = null;
 let onlinePlayers = {};
 
 let socket;
-if (location.hostname.toLowerCase().startsWith("browsercircus")) {
-  socket = io({ path: "/gps-hair/socket.io" });
-} else {
-  socket = io();
+if(location.hostname.toLowerCase().startsWith('browsercircus') || location.hostname.toLowerCase().startsWith('www')){
+  socket = io({path: "/luna/port-4240/socket.io"});
+}else{
+  socket = io(); 
 }
 
 let mappa_options = {
@@ -118,6 +118,7 @@ function handleNewPosition(pos) {
   currentLon = lonlat[0];
   currentLat = lonlat[1];
   currentHeading = pos.coords.heading;
+
 
   // First fix: register origin and create hero marker
   if (myOriginLat === null) {
@@ -252,14 +253,14 @@ function handleOrientation(event) {
     deviceHeading = (360 - event.alpha) % 360;
   }
   // Ignore non-absolute deviceorientation events (relative, not useful)
-  console.log(
-    "orientation:",
-    event.webkitCompassHeading,
-    event.alpha,
-    event.absolute,
-    "→ deviceHeading:",
-    deviceHeading,
-  );
+  // console.log(
+  //   "orientation:",
+  //   event.webkitCompassHeading,
+  //   event.alpha,
+  //   event.absolute,
+  //   "→ deviceHeading:",
+  //   deviceHeading,
+  // );
 }
 
 // -------------------------------------------------------------
