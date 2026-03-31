@@ -26,7 +26,7 @@ const heroConfigs = {
     tilt: 0.5,
   },
 schwarzenegger: {
-  imgFile: "public/assets/Schwarzenegger.png",
+  imgFile: "public/assets/schwarzenegger.png",
   headCx: -0.1,
   headCy: -0.24,
   ellipse_rx: 0.01,
