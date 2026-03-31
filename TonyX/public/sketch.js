@@ -12,6 +12,9 @@ let myHeading = 0;
 let myOriginLat = null;
 let myOriginLon = null;
 
+let worldOriginLat = null;
+let worldOriginLon = null;
+
 let heroImg;
 let heroData;
 
@@ -109,8 +112,8 @@ function draw() {
 
 function calibration() {
   if (!mapInit || !myMap || !myMap.map) return;
-  if (myOriginLat === null || myOriginLon === null) return;
-  myMap.map.setView([myOriginLat, myOriginLon], zoom, { animate: false });
+  if (worldOriginLat === null) return;
+  myMap.map.setView([worldOriginLat, worldOriginLon], zoom, { animate: false });
 }
 
 function windowResized() {
@@ -127,7 +130,6 @@ function handleNewPosition(pos) {
   if (myOriginLat === null) {
     myOriginLat = currentLat;
     myOriginLon = currentLon;
-    heroData = new ImageData(myOriginLat, myOriginLon, heroImg);
 
     socket.emit("registerOrigin", {
       originLat: myOriginLat,
@@ -141,15 +143,16 @@ function handleNewPosition(pos) {
     }
   }
 
+  // heroData 在收到 worldOrigin 后才创建
+  if (!heroData && worldOriginLat !== null) {
+    heroData = new ImageData(heroImg);
+  }
+
   if (myTraceID && traces[myTraceID]) {
     addPointToTrace(traces[myTraceID], currentLat, currentLon);
   }
 
-  if (
-    mySocketID &&
-    onlinePlayers[mySocketID] &&
-    onlinePlayers[mySocketID].dot
-  ) {
+  if (mySocketID && onlinePlayers[mySocketID] && onlinePlayers[mySocketID].dot) {
     let dot = onlinePlayers[mySocketID].dot;
     dot.currentLat = currentLat;
     dot.currentLon = currentLon;
@@ -170,28 +173,26 @@ function onMapChange() {
 }
 
 function gpsToScreen(traceData, lat, lon) {
-  if (!mapInit || !myMap || !myMap.map || !traceData.originLat)
+  if (!mapInit || !myMap || !myMap.map || !traceData.originLat || !worldOriginLat)
     return null;
 
   let scale = Math.pow(2, myMap.map.getZoom() - zoom);
   let hx = traceData.headOffsetX * scale;
   let hy = traceData.headOffsetY * scale;
+
+  let worldPx  = myMap.latLngToPixel(worldOriginLat, worldOriginLon);
   let originPx = myMap.latLngToPixel(traceData.originLat, traceData.originLon);
-  let pointPx = myMap.latLngToPixel(lat, lon);
+  let pointPx  = myMap.latLngToPixel(lat, lon);
 
   return {
-    x: originPx.x + hx + (pointPx.x - originPx.x),
-    y: originPx.y + hy + (pointPx.y - originPx.y),
+    x: width / 2 + hx + (originPx.x - worldPx.x) + (pointPx.x - originPx.x),
+    y: height / 2 + hy + (originPx.y - worldPx.y) + (pointPx.y - originPx.y),
   };
 }
 
 function addPointToTrace(traceData, lat, lon) {
   let last = traceData.points[traceData.points.length - 1];
-  if (
-    last &&
-    Math.abs(last.lat - lat) < 1e-7 &&
-    Math.abs(last.lon - lon) < 1e-7
-  )
+  if (last && Math.abs(last.lat - lat) < 1e-7 && Math.abs(last.lon - lon) < 1e-7)
     return;
   traceData.points.push({ lat, lon });
   if (mapInit && traceData.originLat) {
@@ -213,10 +214,15 @@ socket.on("connected", function (data) {
   mySocketID = data.socketID;
   myTraceID = data.traceID;
 
-  // 加载所有历史 traces（包括自己这条新的）
+  if (data.worldOrigin) {
+    worldOriginLat = data.worldOrigin.lat;
+    worldOriginLon = data.worldOrigin.lon;
+    heroData = new ImageData(heroImg);
+  }
+
   for (let id in data.traces) {
     let td = data.traces[id];
-     if (td.heroKey !== HERO_KEY) continue; 
+    if (td.heroKey !== HERO_KEY) continue;
     traces[id] = {
       headOffsetX: td.headOffsetX,
       headOffsetY: td.headOffsetY,
@@ -246,6 +252,13 @@ socket.on("connected", function (data) {
     if (mapInit) onlinePlayers[sid].dot.recalculate();
   }
 
+  if (mapInit) onMapChange();
+});
+
+socket.on("worldOrigin", function (data) {
+  worldOriginLat = data.lat;
+  worldOriginLon = data.lon;
+  if (!heroData) heroData = new ImageData(heroImg);
   if (mapInit) onMapChange();
 });
 
@@ -292,6 +305,8 @@ socket.on("deletePlayer", function (data) {
   delete onlinePlayers[data.socketID];
 });
 
+// ── Drawing ────────────────────────────────────────────────────
+
 function playerTrace(td) {
   if (td.pxPoints.length === 0) return;
   push();
@@ -318,24 +333,17 @@ function playerTrace(td) {
 }
 
 class ImageData {
-  constructor(lat, lon, img) {
-    this.lat = lat;
-    this.lon = lon;
+  constructor(img) {
     this.img = img;
-    this.x = 0;
-    this.y = 0;
+    this.x = width / 2;
+    this.y = height / 2;
     this.w = size;
     this.h = size * (img.height / img.width);
   }
 
   recalculate() {
-    if (!mapInit || !myMap || !myMap.map) return;
-    let pos = myMap.latLngToPixel(this.lat, this.lon);
-    let scale = Math.pow(2, myMap.map.getZoom() - zoom);
-    this.x = pos.x;
-    this.y = pos.y;
-    this.w = size * scale;
-    this.h = size * (this.img.height / this.img.width) * scale;
+    this.x = width / 2;
+    this.y = height / 2;
   }
 
   display() {

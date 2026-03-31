@@ -25,14 +25,14 @@ const heroConfigs = {
     ellipse_ry: 0.11,
     tilt: 0.5,
   },
-schwarzenegger: {
-  imgFile: "public/assets/schwarzenegger.png",
-  headCx: -0.1,
-  headCy: -0.24,
-  ellipse_rx: 0.01,
-  ellipse_ry: 0.01,
-  tilt: 0.0,
-},
+  schwarzenegger: {
+    imgFile: "public/assets/schwarzenegger.png",
+    headCx: -0.1,
+    headCy: -0.24,
+    ellipse_rx: 0.01,
+    ellipse_ry: 0.01,
+    tilt: 0.0,
+  },
 };
 
 const heroMeta = {};
@@ -61,6 +61,7 @@ function randomHeadOffset(heroKey) {
 
 let players = {};
 let traces = {};
+let worldOrigins = { jingwu: null, schwarzenegger: null };
 
 io.on("connection", (socket) => {
   console.log("connected", socket.id);
@@ -98,6 +99,7 @@ io.on("connection", (socket) => {
       headOffsetX: offset.headOffsetX,
       headOffsetY: offset.headOffsetY,
       color: "#000000",
+      worldOrigin: worldOrigins[heroKey],
       traces: traces,
       onlinePlayers: Object.fromEntries(
         Object.entries(players).map(([sid, p]) => [
@@ -127,8 +129,16 @@ io.on("connection", (socket) => {
     let p = players[socket.id];
     if (!p) return;
     let traceID = p.traceID;
+    let heroKey = p.heroKey;
+
     traces[traceID].originLat = data.originLat;
     traces[traceID].originLon = data.originLon;
+
+    // 每个 hero 只记录第一个人的位置作为世界锚点
+    if (!worldOrigins[heroKey]) {
+      worldOrigins[heroKey] = { lat: data.originLat, lon: data.originLon };
+      io.emit("worldOrigin", { heroKey, ...worldOrigins[heroKey] });
+    }
 
     socket.broadcast.emit("traceOrigin", {
       traceID,
