@@ -1,8 +1,3 @@
-const headCx = 0.2;
-const headCy = -0.38;
-const ellipseRx = 0.17;
-const ellipseRy = 0.11;
-const tilt = 0.5;
 const size = 300;
 const zoom = 16;
 
@@ -13,10 +8,7 @@ let mapInit = false;
 
 let currentLat = 0;
 let currentLon = 0;
-let mapRotation = 0;
 let myHeading = 0;
-let rotateStartAngle = null;
-let rotateStartMapRotation = 0;
 let myOriginLat = null;
 let myOriginLon = null;
 let myOriginAccuracy = Infinity;
@@ -28,7 +20,6 @@ let traces = {};
 let myTraceID = null;
 let mySocketID = null;
 
-// onlinePlayers[socketID] = { traceID, dot: PersonDot }
 let onlinePlayers = {};
 
 let socket;
@@ -45,11 +36,9 @@ let mappa_options = {
   lat: 0,
   lng: 0,
   zoom: zoom,
-  //style: "https://b.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png", 
-  style: "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
-  //style: 'https://webst01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=6&x={x}&y={y}&z={z}',
+  style:
+    "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}",
 };
-
 
 function preload() {
   heroImg = loadImage("assets/JingWu01.png");
@@ -60,13 +49,11 @@ function setup() {
   canvas.parent("p5-canvas-container");
   textAlign(CENTER, CENTER);
   textSize(11);
-  setupRotationGesture();
 }
 
 function draw() {
   clear();
 
-  // Initialize map on first valid GPS fix
   if (!mapInit && GPS_GRANTED && currentLon !== 0) {
     mappa_options.lat = currentLat;
     mappa_options.lng = currentLon;
@@ -82,10 +69,6 @@ function draw() {
   rect(0, 0, width, height);
 
   if (mapInit) {
-    push();
-    translate(width / 2, height / 2);
-    rotate(radians(mapRotation));
-    translate(-width / 2, -height / 2);
     if (heroData) {
       heroData.recalculate();
       heroData.display();
@@ -95,11 +78,9 @@ function draw() {
       if (onlinePlayers[sid].dot) onlinePlayers[sid].dot.display();
     }
     drawPointers();
-    pop();
   }
 
   drawInfo();
-  if (GPS_GRANTED) drawCompass();
 }
 
 function windowResized() {
@@ -107,78 +88,14 @@ function windowResized() {
   if (mapInit) onMapChange();
 }
 
-
-//map rotation
-function setupRotationGesture() {
-  document.addEventListener(
-    "touchstart",
-    (e) => {
-      if (e.touches.length === 2) {
-        rotateStartAngle = fingerAngle(e.touches);
-        rotateStartMapRotation = mapRotation;
-      }
-    },
-    { passive: true },
-  );
-
-  document.addEventListener(
-    "touchmove",
-    (e) => {
-      if (e.touches.length !== 2 || rotateStartAngle === null) return;
-      let delta = fingerAngle(e.touches) - rotateStartAngle;
-      mapRotation = rotateStartMapRotation + delta;
-      applyMapRotation();
-    },
-    { passive: true },
-  );
-
-  document.addEventListener(
-    "touchend",
-    (e) => {
-      if (e.touches.length < 2) rotateStartAngle = null;
-    },
-    { passive: true },
-  );
-}
-
-function fingerAngle(touches) {
-  return (
-    (Math.atan2(
-      touches[1].clientY - touches[0].clientY,
-      touches[1].clientX - touches[0].clientX,
-    ) *
-      180) /
-    Math.PI
-  );
-}
-
-function applyMapRotation() {
-  if (!mapInit || !myMap || !myMap.map) return;
-
-  const panes = myMap.map.getPanes();
-  if (!panes || !panes.tilePane || !panes.mapPane) return;
-
-  const tilePane = panes.tilePane;
-  const mapPane = panes.mapPane;
-
-  const r = mapPane.getBoundingClientRect();
-  const ox = width / 2 - r.left;
-  const oy = height / 2 - r.top;
-
-  tilePane.style.transformOrigin = ox + "px " + oy + "px";
-  tilePane.style.transform = "rotate(" + mapRotation + "deg)";
-}
-
-//gps
 function handleNewPosition(pos) {
   let lonlat = fixForChineseMap(pos);
   currentLon = lonlat[0];
   currentLat = lonlat[1];
   if (pos.coords.heading != null) myHeading = pos.coords.heading;
 
-  let accuracy = pos.coords.accuracy; // metres
+  let accuracy = pos.coords.accuracy;
 
-  // First fix: set origin and place the local head image
   if (myOriginLat === null) {
     myOriginLat = currentLat;
     myOriginLon = currentLon;
@@ -196,8 +113,6 @@ function handleNewPosition(pos) {
       if (mapInit) recalcTrace(traces[myTraceID]);
     }
   } else if (accuracy < myOriginAccuracy * 0.5) {
-    // A significantly more accurate fix arrived — update the origin in place.
-    // This corrects a stale or low-accuracy first fix without growing new hair.
     myOriginLat = currentLat;
     myOriginLon = currentLon;
     myOriginAccuracy = accuracy;
@@ -220,17 +135,17 @@ function handleNewPosition(pos) {
     addPointToTrace(traces[myTraceID], currentLat, currentLon);
   }
 
-if (mySocketID && onlinePlayers[mySocketID] && onlinePlayers[mySocketID].dot) {
-  let dot = onlinePlayers[mySocketID].dot;
-  dot.currentLat = currentLat;
-  dot.currentLon = currentLon;
-  if (mapInit) dot.recalculate();
-}
+  if (mySocketID && onlinePlayers[mySocketID] && onlinePlayers[mySocketID].dot) {
+    let dot = onlinePlayers[mySocketID].dot;
+    dot.currentLat = currentLat;
+    dot.currentLon = currentLon;
+    if (mapInit) dot.recalculate();
+  }
+
   socket.emit("locationFromClient", { lat: currentLat, lon: currentLon });
   if (mapInit) onMapChange();
 }
 
-//map change callback
 function onMapChange() {
   if (!myMap || !myMap.map) return;
   if (heroData) heroData.recalculate();
@@ -238,18 +153,10 @@ function onMapChange() {
   for (let sid in onlinePlayers) {
     if (onlinePlayers[sid].dot) onlinePlayers[sid].dot.recalculate();
   }
-  applyMapRotation();
 }
 
-//location transform
 function gpsToScreen(traceData, lat, lon) {
-  if (
-    !mapInit ||
-    !myMap ||
-    !myMap.map ||
-    !traceData.originLat ||
-    myOriginLat === null
-  )
+  if (!mapInit || !myMap || !myMap.map || !traceData.originLat || myOriginLat === null)
     return null;
 
   let scale = Math.pow(2, myMap.map.getZoom() - zoom);
@@ -267,11 +174,7 @@ function gpsToScreen(traceData, lat, lon) {
 
 function addPointToTrace(traceData, lat, lon) {
   let last = traceData.points[traceData.points.length - 1];
-  if (
-    last &&
-    Math.abs(last.lat - lat) < 1e-7 &&
-    Math.abs(last.lon - lon) < 1e-7
-  )
+  if (last && Math.abs(last.lat - lat) < 1e-7 && Math.abs(last.lon - lon) < 1e-7)
     return;
   traceData.points.push({ lat, lon });
   if (mapInit && traceData.originLat) {
@@ -287,7 +190,6 @@ function recalcTrace(traceData) {
     .filter(Boolean);
 }
 
-//socket events
 socket.on("welcome", function (data) {
   mySocketID = data.socketID;
   myTraceID = data.traceID;
@@ -371,18 +273,17 @@ socket.on("locationFromServer", function (data) {
   addPointToTrace(td, data.lat, data.lon);
 
   let op = onlinePlayers[data.socketID];
-if (op && op.dot) {
-  op.dot.currentLat = data.lat;
-  op.dot.currentLon = data.lon;
-  if (mapInit) op.dot.recalculate();
-}
+  if (op && op.dot) {
+    op.dot.currentLat = data.lat;
+    op.dot.currentLon = data.lon;
+    if (mapInit) op.dot.recalculate();
+  }
 });
 
 socket.on("deletePerson", function (data) {
   delete onlinePlayers[data.socketID];
 });
 
-//display traces
 function displayTrace(td) {
   if (td.pxPoints.length === 0) return;
   push();
@@ -401,7 +302,6 @@ function displayTrace(td) {
     }
     endShape();
   }
-  // Root dot at trace origin
   let root = td.pxPoints[0];
   noStroke();
   fill(td.color);
@@ -409,7 +309,6 @@ function displayTrace(td) {
   pop();
 }
 
-//image display
 class ImageData {
   constructor(lat, lon, img) {
     this.lat = lat;
@@ -435,17 +334,6 @@ class ImageData {
     push();
     imageMode(CENTER);
     image(this.img, this.x, this.y, this.w, this.h);
-    // Scalp ellipse overlay
-    let cx = this.x + headCx * this.w;
-    let cy = this.y + headCy * this.h;
-    push();
-    translate(cx, cy);
-    rotate(tilt);
-    fill(0,50);
-    stroke(0,60);
-    strokeWeight(2);
-    ellipse(0, 0, ellipseRx * 2 * this.w, ellipseRy * 2 * this.h);
-    pop();
     pop();
   }
 }
@@ -463,18 +351,16 @@ class PersonDot {
     this.goalY = null;
   }
 
-recalculate() {
-  if (!mapInit || this.currentLat === 0) return;
-
-  let td = traces[this.traceID];
-  if (!td || td.originLat === undefined) return;
-
-  let px = gpsToScreen(td, this.currentLat, this.currentLon);
-  if (px) {
-    this.goalX = px.x;
-    this.goalY = px.y;
+  recalculate() {
+    if (!mapInit || this.currentLat === 0) return;
+    let td = traces[this.traceID];
+    if (!td || td.originLat === undefined) return;
+    let px = gpsToScreen(td, this.currentLat, this.currentLon);
+    if (px) {
+      this.goalX = px.x;
+      this.goalY = px.y;
+    }
   }
-}
 
   display() {
     if (this.goalX === null) return;
@@ -504,7 +390,6 @@ recalculate() {
   }
 }
 
-// off screen pointers
 function drawPointers() {
   for (let sid in onlinePlayers) {
     let dot = onlinePlayers[sid].dot;
@@ -528,89 +413,17 @@ function drawPointers() {
 function pointOnRectEdge(x1, x2, y1, y2, angle) {
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-
   const dx = Math.cos(angle);
   const dy = Math.sin(angle);
-
   const EPS = 1e-12;
-  let sdx = 0;
-  if (Math.abs(dx) >= EPS) {
-    sdx = dx;
-  }
-
-  let sdy = 0;
-  if (Math.abs(dy) >= EPS) {
-    sdy = dy;
-  }
-
   let tx = Infinity;
   let ty = Infinity;
-
-  if (sdx !== 0) {
-    if (dx > 0) {
-      tx = (x2 - cx) / dx;
-    } else {
-      tx = (x1 - cx) / dx;
-    }
-  }
-
-  if (sdy !== 0) {
-    if (dy > 0) {
-      ty = (y2 - cy) / dy;
-    } else {
-      ty = (y1 - cy) / dy;
-    }
-  }
-
+  if (Math.abs(dx) >= EPS) tx = dx > 0 ? (x2 - cx) / dx : (x1 - cx) / dx;
+  if (Math.abs(dy) >= EPS) ty = dy > 0 ? (y2 - cy) / dy : (y1 - cy) / dy;
   const t = Math.min(tx, ty);
-
-  return {
-    x: cx + t * dx,
-    y: cy + t * dy
-  };
-}
-// compass
-function drawCompass() {
-  const r = 38;
-  const cx = width - r - 14;
-  const cy = r + 14;
-
-  push();
-  translate(cx, cy);
-
-  noStroke();
-  fill(0, 170);
-  circle(0, 0, r * 2);
-  stroke(255, 60);
-  strokeWeight(1);
-  noFill();
-  circle(0, 0, r * 2);
-
-  rotate(radians(mapRotation));
-
-  noStroke();
-  textAlign(CENTER, CENTER);
-  textSize(10);
-  fill(255, 80, 80);
-  text("N", 0, -(r - 11));
-  fill(200);
-  text("S", 0, r - 11);
-  text("E", r - 11, 0);
-  text("W", -(r - 11), 0);
-
-  noStroke();
-  fill(220, 60, 60);
-  triangle(0, -(r - 6), -4, 2, 4, 2);
-  fill(160);
-  triangle(0, r - 6, -4, 2, 4, 2);
-
-  fill(255);
-  circle(0, 0, 5);
-
-  pop();
+  return { x: cx + t * dx, y: cy + t * dy };
 }
 
-// real time playing info
 function drawInfo() {
   if (!mapInit) return;
   let labels = [
@@ -635,10 +448,3 @@ function drawInfo() {
   }
   pop();
 }
-
-function touchStarted() {
-  if (mapInit)
-    console.log("TOUCHED", myMap.pixelToLatLng(touches[0].x, touches[0].y));
-}
-function touchMoved() {}
-function touchEnded() {}

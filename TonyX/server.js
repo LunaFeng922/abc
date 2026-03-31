@@ -14,13 +14,11 @@ const { Server } = require("socket.io");
 const io = new Server(HTTPSserver);
 
 const PORT = 4240;
-const COLOR = "#000000";
 
-//head area for hair growing
-const headCx = 0.2;
-const headCy = -0.38;
-const ellipseRx = 0.17;
-const ellipseRy = 0.11;
+const head_cx = 0.2;
+const head_cy = -0.38;
+const ellipse_rx = 0.17;
+const ellipse_ry = 0.11;
 const tilt = 0.5;
 const size = 300;
 const imgBuf = fs.readFileSync("public/assets/JingWu01.png");
@@ -29,25 +27,22 @@ const imgAsp = imgBuf.readUInt32BE(20) / imgBuf.readUInt32BE(16);
 function randomHeadOffset() {
   let angle = Math.random() * Math.PI * 2;
   let r = Math.sqrt(Math.random());
-  let ex = ellipseRx * r * Math.cos(angle);
-  let ey = ellipseRy * r * Math.sin(angle);
+  let ex = ellipse_rx * r * Math.cos(angle);
+  let ey = ellipse_ry * r * Math.sin(angle);
 
   let pxX = ex * size;
   let pxY = ey * size * imgAsp;
   let rx = pxX * Math.cos(tilt) - pxY * Math.sin(tilt);
   let ry = pxX * Math.sin(tilt) + pxY * Math.cos(tilt);
   return {
-    headOffsetX: headCx * size + rx,
-    headOffsetY: headCy * size * imgAsp + ry,
+    headOffsetX: head_cx * size + rx,
+    headOffsetY: head_cy * size * imgAsp + ry,
   };
 }
 
 let players = {};
 let persistedTraces = {};
-let globalOriginLat = null;
-let globalOriginLon = null;
 
-// socket events
 io.on("connection", (socket) => {
   console.log("connected", socket.id);
 
@@ -57,7 +52,7 @@ io.on("connection", (socket) => {
   persistedTraces[traceID] = {
     headOffsetX: offset.headOffsetX,
     headOffsetY: offset.headOffsetY,
-    color: COLOR,
+    color: "#000000",
     originLat: null,
     originLon: null,
     points: [],
@@ -67,7 +62,7 @@ io.on("connection", (socket) => {
     traceID,
     headOffsetX: offset.headOffsetX,
     headOffsetY: offset.headOffsetY,
-    color: COLOR,
+    color: "#000000",
     currentLat: 0,
     currentLon: 0,
   };
@@ -77,52 +72,36 @@ io.on("connection", (socket) => {
     traceID,
     headOffsetX: offset.headOffsetX,
     headOffsetY: offset.headOffsetY,
-    color: COLOR,
+    color: "#000000",
   });
 
-  // Send full trace history + current online players to the newcomer
   socket.emit("initData", {
     traces: persistedTraces,
     myTraceID: traceID,
-    globalOriginLat,
-    globalOriginLon,
     onlinePlayers: Object.fromEntries(
       Object.entries(players).map(([sid, p]) => [
         sid,
         {
           traceID: p.traceID,
-          headOffsetX: p.headOffsetX,
-          headOffsetY: p.headOffsetY,
           color: p.color,
           currentLat: p.currentLat,
           currentLon: p.currentLon,
         },
-      ]),
+      ])
     ),
   });
 
-  // Notify existing clients of the new player
   socket.broadcast.emit("playerJoined", {
     socketID: socket.id,
     traceID,
     headOffsetX: offset.headOffsetX,
     headOffsetY: offset.headOffsetY,
-    color: COLOR,
+    color: "#000000",
   });
 
-  // First GPS fix — register the trace origin
   socket.on("registerOrigin", function (data) {
     persistedTraces[traceID].originLat = data.originLat;
     persistedTraces[traceID].originLon = data.originLon;
-    players[socket.id].originLat = data.originLat;
-    players[socket.id].originLon = data.originLon;
-
-    // First user to register sets the global head position for everyone
-    if (globalOriginLat === null) {
-      globalOriginLat = data.originLat;
-      globalOriginLon = data.originLon;
-      io.emit("globalOrigin", { lat: globalOriginLat, lon: globalOriginLon });
-    }
 
     socket.broadcast.emit("traceOrigin", {
       traceID,
@@ -131,7 +110,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  // Continuous location updates
   socket.on("locationFromClient", function (data) {
     let p = players[socket.id];
     if (!p) return;
@@ -148,7 +126,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  // Remove live session; keep trace history
   socket.on("disconnect", function () {
     console.log("disconnected", socket.id);
     socket.broadcast.emit("deletePerson", { socketID: socket.id });
