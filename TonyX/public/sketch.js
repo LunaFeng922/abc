@@ -21,10 +21,9 @@ let mySocketID = null;
 
 let onlinePlayers = {};
 
-let socket;
-
 let homeBtn;
 
+let socket;
 if (
   location.hostname.toLowerCase().startsWith("browsercircus") ||
   location.hostname.toLowerCase().startsWith("www")
@@ -43,7 +42,11 @@ let mappa_options = {
 };
 
 function preload() {
-  heroImg = loadImage("assets/JingWu01.png");
+  if (HERO_KEY === "schwarzenegger") {
+    heroImg = loadImage("assets/schwarzenegger.png");
+  } else {
+    heroImg = loadImage("assets/JingWu01.png");
+  }
 }
 
 function setup() {
@@ -51,13 +54,31 @@ function setup() {
   canvas.parent("p5-canvas-container");
   textAlign(CENTER, CENTER);
   textSize(11);
-  homeBtn = createButton("Home");
-  homeBtn.position(width / 2 - 100, height / 2 - 50);
-  homeBtn.size(200, 100);
+
+  let gpsBtn = select("#requestOrientationButton");
+  if (gpsBtn) {
+    gpsBtn.mousePressed(() => {
+      requestGPS();
+      requestOrientation();
+      gpsBtn.hide();
+    });
+  }
+
+  homeBtn = createButton("🌍");
+  homeBtn.position(width - 48, 12);
+  homeBtn.size(36, 36);
   homeBtn.style("position", "fixed");
   homeBtn.style("z-index", "9999");
   homeBtn.style("pointer-events", "auto");
+  homeBtn.style("cursor", "pointer");
+  homeBtn.style("font-size", "20px");
+  homeBtn.style("background", "transparent");
+  homeBtn.style("border", "none");
+  homeBtn.style("outline", "none");
+  homeBtn.style("padding", "0");
   homeBtn.mousePressed(calibration);
+
+  socket.emit("selectHero", { hero: HERO_KEY });
 }
 
 function draw() {
@@ -70,14 +91,13 @@ function draw() {
     myMap.overlay(canvas);
     myMap.onChange(onMapChange);
     mapInit = true;
-
     onMapChange();
   }
 
   noStroke();
 
   if (mapInit) {
-    if (heroData) heroData.display(); // 只在这里 display，recalculate 已由 onMapChange 做过
+    if (heroData) heroData.display();
     for (let id in traces) playerTrace(traces[id]);
     for (let sid in onlinePlayers) {
       if (onlinePlayers[sid].dot) onlinePlayers[sid].dot.display();
@@ -142,7 +162,6 @@ function handleNewPosition(pos) {
 
 function onMapChange() {
   if (!myMap || !myMap.map) return;
-  // 只重算坐标，不 display
   if (heroData) heroData.recalculate();
   for (let id in traces) recalcTrace(traces[id]);
   for (let sid in onlinePlayers) {
@@ -195,28 +214,15 @@ function recalcTrace(traceData) {
     .filter(Boolean);
 }
 
+// ── Socket events ──────────────────────────────────────────────
+
 socket.on("connected", function (data) {
   mySocketID = data.socketID;
   myTraceID = data.traceID;
 
-  traces[myTraceID] = {
-    headOffsetX: data.headOffsetX,
-    headOffsetY: data.headOffsetY,
-    color: data.color,
-    originLat: null,
-    originLon: null,
-    points: [],
-    pxPoints: [],
-  };
-
-  onlinePlayers[mySocketID] = {
-    traceID: myTraceID,
-    dot: new playerDot(data.color, myTraceID, true),
-  };
-
   for (let id in data.traces) {
-    if (id === myTraceID) continue;
     let td = data.traces[id];
+    if (td.heroKey !== HERO_KEY) continue;
     traces[id] = {
       headOffsetX: td.headOffsetX,
       headOffsetY: td.headOffsetY,
@@ -228,9 +234,15 @@ socket.on("connected", function (data) {
     };
   }
 
+  onlinePlayers[mySocketID] = {
+    traceID: myTraceID,
+    dot: new playerDot(data.color, myTraceID, true),
+  };
+
   for (let sid in data.onlinePlayers) {
     if (sid === mySocketID) continue;
     let op = data.onlinePlayers[sid];
+    if (op.heroKey !== HERO_KEY) continue;
     onlinePlayers[sid] = {
       traceID: op.traceID,
       dot: new playerDot(op.color, op.traceID, false),
@@ -244,6 +256,7 @@ socket.on("connected", function (data) {
 });
 
 socket.on("newPlayer", function (data) {
+  if (data.heroKey !== HERO_KEY) return;
   if (!traces[data.traceID]) {
     traces[data.traceID] = {
       headOffsetX: data.headOffsetX,
@@ -285,6 +298,8 @@ socket.on("deletePlayer", function (data) {
   delete onlinePlayers[data.socketID];
 });
 
+// ── Drawing ────────────────────────────────────────────────────
+
 function playerTrace(td) {
   if (td.pxPoints.length === 0) return;
   push();
@@ -322,11 +337,11 @@ class ImageData {
   }
 
   recalculate() {
-    if (!mapInit || !myMap || !myMap.map) return;
-    let pos = myMap.latLngToPixel(this.lat, this.lon);
+    if (!mapInit || !myMap || !myMap.map || myOriginLat === null) return;
+    let myOriginPx = myMap.latLngToPixel(myOriginLat, myOriginLon);
     let scale = Math.pow(2, myMap.map.getZoom() - zoom);
-    this.x = pos.x;
-    this.y = pos.y;
+    this.x = myOriginPx.x;
+    this.y = myOriginPx.y;
     this.w = size * scale;
     this.h = size * (this.img.height / this.img.width) * scale;
   }
