@@ -43,7 +43,7 @@ let mappa_options = {
 
 function preload() {
   if (HERO_KEY === "schwarzenegger") {
-    heroImg = loadImage("assets/Schwarzenegger.png");
+    heroImg = loadImage("assets/schwarzenegger.png");
   } else {
     heroImg = loadImage("assets/JingWu01.png");
   }
