@@ -11,7 +11,6 @@ let currentLon = 0;
 let myHeading = 0;
 let myOriginLat = null;
 let myOriginLon = null;
-let myOriginAccuracy = Infinity;
 
 let heroImg;
 let heroData;
@@ -21,6 +20,8 @@ let myTraceID = null;
 let mySocketID = null;
 
 let onlinePlayers = {};
+
+let homeBtn;
 
 let socket;
 if (
@@ -41,7 +42,11 @@ let mappa_options = {
 };
 
 function preload() {
-  heroImg = loadImage("assets/JingWu01.png");
+  if (HERO_KEY === "schwarzenegger") {
+    heroImg = loadImage("assets/Schwarzenegger.png");
+  } else {
+    heroImg = loadImage("assets/JingWu01.png");
+  }
 }
 
 function setup() {
@@ -49,6 +54,31 @@ function setup() {
   canvas.parent("p5-canvas-container");
   textAlign(CENTER, CENTER);
   textSize(11);
+
+  let gpsBtn = select("#requestOrientationButton");
+  if (gpsBtn) {
+    gpsBtn.mousePressed(() => {
+      requestGPS();
+      requestOrientation();
+      gpsBtn.hide();
+    });
+  }
+
+  homeBtn = createButton("🌍");
+  homeBtn.position(width - 48, 12);
+  homeBtn.size(36, 36);
+  homeBtn.style("position", "fixed");
+  homeBtn.style("z-index", "9999");
+  homeBtn.style("pointer-events", "auto");
+  homeBtn.style("cursor", "pointer");
+  homeBtn.style("font-size", "20px");
+  homeBtn.style("background", "transparent");
+  homeBtn.style("border", "none");
+  homeBtn.style("outline", "none");
+  homeBtn.style("padding", "0");
+  homeBtn.mousePressed(calibration);
+
+  socket.emit("selectHero", { hero: HERO_KEY });
 }
 
 function draw() {
@@ -65,22 +95,22 @@ function draw() {
   }
 
   noStroke();
-  fill(0, 150);
-  rect(0, 0, width, height);
 
   if (mapInit) {
-    if (heroData) {
-      heroData.recalculate();
-      heroData.display();
-    }
-    for (let id in traces) displayTrace(traces[id]);
+    if (heroData) heroData.display();
+    for (let id in traces) playerTrace(traces[id]);
     for (let sid in onlinePlayers) {
       if (onlinePlayers[sid].dot) onlinePlayers[sid].dot.display();
     }
-    drawPointers();
   }
 
-  drawInfo();
+  drawLabels();
+}
+
+function calibration() {
+  if (!mapInit || !myMap || !myMap.map) return;
+  if (myOriginLat === null || myOriginLon === null) return;
+  myMap.map.setView([myOriginLat, myOriginLon], zoom, { animate: false });
 }
 
 function windowResized() {
@@ -94,12 +124,9 @@ function handleNewPosition(pos) {
   currentLat = lonlat[1];
   if (pos.coords.heading != null) myHeading = pos.coords.heading;
 
-  let accuracy = pos.coords.accuracy;
-
   if (myOriginLat === null) {
     myOriginLat = currentLat;
     myOriginLon = currentLon;
-    myOriginAccuracy = accuracy;
     heroData = new ImageData(myOriginLat, myOriginLon, heroImg);
 
     socket.emit("registerOrigin", {
@@ -112,30 +139,17 @@ function handleNewPosition(pos) {
       traces[myTraceID].originLon = myOriginLon;
       if (mapInit) recalcTrace(traces[myTraceID]);
     }
-  } else if (accuracy < myOriginAccuracy * 0.5) {
-    myOriginLat = currentLat;
-    myOriginLon = currentLon;
-    myOriginAccuracy = accuracy;
-    heroData = new ImageData(myOriginLat, myOriginLon, heroImg);
-
-    if (myTraceID && traces[myTraceID]) {
-      traces[myTraceID].originLat = myOriginLat;
-      traces[myTraceID].originLon = myOriginLon;
-    }
-
-    socket.emit("registerOrigin", {
-      originLat: myOriginLat,
-      originLon: myOriginLon,
-    });
-
-    if (mapInit) onMapChange();
   }
 
   if (myTraceID && traces[myTraceID]) {
     addPointToTrace(traces[myTraceID], currentLat, currentLon);
   }
 
-  if (mySocketID && onlinePlayers[mySocketID] && onlinePlayers[mySocketID].dot) {
+  if (
+    mySocketID &&
+    onlinePlayers[mySocketID] &&
+    onlinePlayers[mySocketID].dot
+  ) {
     let dot = onlinePlayers[mySocketID].dot;
     dot.currentLat = currentLat;
     dot.currentLon = currentLon;
@@ -156,7 +170,7 @@ function onMapChange() {
 }
 
 function gpsToScreen(traceData, lat, lon) {
-  if (!mapInit || !myMap || !myMap.map || !traceData.originLat || myOriginLat === null)
+  if (!mapInit || !myMap || !myMap.map || !traceData.originLat)
     return null;
 
   let scale = Math.pow(2, myMap.map.getZoom() - zoom);
@@ -164,17 +178,20 @@ function gpsToScreen(traceData, lat, lon) {
   let hy = traceData.headOffsetY * scale;
   let originPx = myMap.latLngToPixel(traceData.originLat, traceData.originLon);
   let pointPx = myMap.latLngToPixel(lat, lon);
-  let myOriginPx = myMap.latLngToPixel(myOriginLat, myOriginLon);
 
   return {
-    x: myOriginPx.x + hx + (pointPx.x - originPx.x),
-    y: myOriginPx.y + hy + (pointPx.y - originPx.y),
+    x: originPx.x + hx + (pointPx.x - originPx.x),
+    y: originPx.y + hy + (pointPx.y - originPx.y),
   };
 }
 
 function addPointToTrace(traceData, lat, lon) {
   let last = traceData.points[traceData.points.length - 1];
-  if (last && Math.abs(last.lat - lat) < 1e-7 && Math.abs(last.lon - lon) < 1e-7)
+  if (
+    last &&
+    Math.abs(last.lat - lat) < 1e-7 &&
+    Math.abs(last.lon - lon) < 1e-7
+  )
     return;
   traceData.points.push({ lat, lon });
   if (mapInit && traceData.originLat) {
@@ -190,30 +207,16 @@ function recalcTrace(traceData) {
     .filter(Boolean);
 }
 
-socket.on("welcome", function (data) {
+// ── Socket events ──────────────────────────────────────────────
+
+socket.on("connected", function (data) {
   mySocketID = data.socketID;
   myTraceID = data.traceID;
 
-  traces[myTraceID] = {
-    headOffsetX: data.headOffsetX,
-    headOffsetY: data.headOffsetY,
-    color: data.color,
-    originLat: null,
-    originLon: null,
-    points: [],
-    pxPoints: [],
-  };
-
-  onlinePlayers[mySocketID] = {
-    traceID: myTraceID,
-    dot: new PersonDot(data.color, myTraceID, true),
-  };
-});
-
-socket.on("initData", function (data) {
+  // 加载所有历史 traces（包括自己这条新的）
   for (let id in data.traces) {
-    if (id === myTraceID) continue;
     let td = data.traces[id];
+     if (td.heroKey !== HERO_KEY) continue; 
     traces[id] = {
       headOffsetX: td.headOffsetX,
       headOffsetY: td.headOffsetY,
@@ -225,24 +228,29 @@ socket.on("initData", function (data) {
     };
   }
 
+  onlinePlayers[mySocketID] = {
+    traceID: myTraceID,
+    dot: new playerDot(data.color, myTraceID, true),
+  };
+
   for (let sid in data.onlinePlayers) {
     if (sid === mySocketID) continue;
     let op = data.onlinePlayers[sid];
-    if (!onlinePlayers[sid]) {
-      onlinePlayers[sid] = {
-        traceID: op.traceID,
-        dot: new PersonDot(op.color, op.traceID, false),
-      };
-      onlinePlayers[sid].dot.currentLat = op.currentLat;
-      onlinePlayers[sid].dot.currentLon = op.currentLon;
-      if (mapInit) onlinePlayers[sid].dot.recalculate();
-    }
+    if (op.heroKey !== HERO_KEY) continue;
+    onlinePlayers[sid] = {
+      traceID: op.traceID,
+      dot: new playerDot(op.color, op.traceID, false),
+    };
+    onlinePlayers[sid].dot.currentLat = op.currentLat;
+    onlinePlayers[sid].dot.currentLon = op.currentLon;
+    if (mapInit) onlinePlayers[sid].dot.recalculate();
   }
 
   if (mapInit) onMapChange();
 });
 
-socket.on("playerJoined", function (data) {
+socket.on("newPlayer", function (data) {
+  if (data.heroKey !== HERO_KEY) return;
   if (!traces[data.traceID]) {
     traces[data.traceID] = {
       headOffsetX: data.headOffsetX,
@@ -256,7 +264,7 @@ socket.on("playerJoined", function (data) {
   }
   onlinePlayers[data.socketID] = {
     traceID: data.traceID,
-    dot: new PersonDot(data.color, data.traceID, false),
+    dot: new playerDot(data.color, data.traceID, false),
   };
 });
 
@@ -280,11 +288,11 @@ socket.on("locationFromServer", function (data) {
   }
 });
 
-socket.on("deletePerson", function (data) {
+socket.on("deletePlayer", function (data) {
   delete onlinePlayers[data.socketID];
 });
 
-function displayTrace(td) {
+function playerTrace(td) {
   if (td.pxPoints.length === 0) return;
   push();
   if (td.pxPoints.length >= 2) {
@@ -338,7 +346,7 @@ class ImageData {
   }
 }
 
-class PersonDot {
+class playerDot {
   constructor(col, traceID, isMe) {
     this.col = col;
     this.traceID = traceID;
@@ -390,41 +398,7 @@ class PersonDot {
   }
 }
 
-function drawPointers() {
-  for (let sid in onlinePlayers) {
-    let dot = onlinePlayers[sid].dot;
-    if (!dot || dot.x === null) continue;
-    if (dot.x > 10 && dot.x < width - 10 && dot.y > 10 && dot.y < height - 10)
-      continue;
-    let ang = Math.atan2(dot.y - height / 2, dot.x - width / 2);
-    let pos = pointOnRectEdge(10, width - 10, 10, height - 10, ang);
-    push();
-    translate(pos.x, pos.y);
-    rotate(ang - PI / 2);
-    scale(1.4);
-    fill(dot.col);
-    stroke("white");
-    strokeWeight(2);
-    triangle(-4, -4, 0, 5, 4, -4);
-    pop();
-  }
-}
-
-function pointOnRectEdge(x1, x2, y1, y2, angle) {
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
-  const dx = Math.cos(angle);
-  const dy = Math.sin(angle);
-  const EPS = 1e-12;
-  let tx = Infinity;
-  let ty = Infinity;
-  if (Math.abs(dx) >= EPS) tx = dx > 0 ? (x2 - cx) / dx : (x1 - cx) / dx;
-  if (Math.abs(dy) >= EPS) ty = dy > 0 ? (y2 - cy) / dy : (y1 - cy) / dy;
-  const t = Math.min(tx, ty);
-  return { x: cx + t * dx, y: cy + t * dy };
-}
-
-function drawInfo() {
+function drawLabels() {
   if (!mapInit) return;
   let labels = [
     "Hairs: " + Object.keys(traces).length,

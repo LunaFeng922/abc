@@ -539,10 +539,13 @@
                   }
                   L.overlay = L.Layer.extend({
                     onAdd: function onAdd() {
-                      var overlayPane = overlay.getPane();
-                      var container = L.DomUtil.create("div", "leaflet-layer");
-                      container.appendChild(_this3.canvas);
-                      overlayPane.appendChild(container);
+                      var mapContainer = _this3.map.getContainer();
+                      mapContainer.parentElement.appendChild(_this3.canvas);
+                      _this3.canvas.style.position = "absolute";
+                      _this3.canvas.style.top = "0px";
+                      _this3.canvas.style.left = "0px";
+                      _this3.canvas.style.pointerEvents = "none";
+                      _this3.canvas.style.zIndex = "1000";
                     },
                     drawLayer: function drawLayer() {},
                   });
@@ -552,17 +555,17 @@
                   var cnvs =
                     this.canvas.getContext("webgl") ||
                     this.canvas.getContext("2d");
-                  this.map.on("move", function () {
-                    var d = _this3.map.dragging._draggable;
-                    if (d._newPos) {
-                      cnvs.canvas.style.transform =
-                        "translate(" +
-                        -d._newPos.x +
-                        "px, " +
-                        -d._newPos.y +
-                        "px)";
-                    }
-                  });
+                  // this.map.on("move", function () {
+                  //   var d = _this3.map.dragging._draggable;
+                  //   if (d._newPos) {
+                  //     cnvs.canvas.style.transform =
+                  //       "translate(" +
+                  //       -d._newPos.x +
+                  //       "px, " +
+                  //       -d._newPos.y +
+                  //       "px)";
+                  //   }
+                  // });
                 },
               },
               {
