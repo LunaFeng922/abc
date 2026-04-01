@@ -18,8 +18,6 @@ let heroData;
 let traces = {};
 let myTraceID = null;
 let mySocketID = null;
-let myHeadOffsetX = 0;
-let myHeadOffsetY = 0;
 
 let onlinePlayers = {};
 
@@ -129,7 +127,7 @@ function handleNewPosition(pos) {
   if (myOriginLat === null) {
     myOriginLat = currentLat;
     myOriginLon = currentLon;
-    heroData = new ImageData(myOriginLat, myOriginLon, heroImg, myHeadOffsetX, myHeadOffsetY);
+    heroData = new ImageData(myOriginLat, myOriginLon, heroImg);
 
     socket.emit("registerOrigin", {
       originLat: myOriginLat,
@@ -182,13 +180,15 @@ function gpsToScreen(traceData, lat, lon) {
     return null;
 
   let scale = Math.pow(2, myMap.map.getZoom() - zoom);
+  let hx = traceData.headOffsetX * scale;
+  let hy = traceData.headOffsetY * scale;
   let originPx = myMap.latLngToPixel(traceData.originLat, traceData.originLon);
   let pointPx = myMap.latLngToPixel(lat, lon);
   let myOriginPx = myMap.latLngToPixel(myOriginLat, myOriginLon);
 
   return {
-    x: myOriginPx.x + (pointPx.x - originPx.x),
-    y: myOriginPx.y + (pointPx.y - originPx.y),
+    x: myOriginPx.x + hx + (pointPx.x - originPx.x),
+    y: myOriginPx.y + hy + (pointPx.y - originPx.y),
   };
 }
 
@@ -219,8 +219,6 @@ function recalcTrace(traceData) {
 socket.on("connected", function (data) {
   mySocketID = data.socketID;
   myTraceID = data.traceID;
-  myHeadOffsetX = data.headOffsetX;
-  myHeadOffsetY = data.headOffsetY;
 
   for (let id in data.traces) {
     let td = data.traces[id];
@@ -328,12 +326,10 @@ function playerTrace(td) {
 }
 
 class ImageData {
-  constructor(lat, lon, img, headOffsetX, headOffsetY) {
+  constructor(lat, lon, img) {
     this.lat = lat;
     this.lon = lon;
     this.img = img;
-    this.headOffsetX = headOffsetX;
-    this.headOffsetY = headOffsetY;
     this.x = 0;
     this.y = 0;
     this.w = size;
@@ -344,8 +340,8 @@ class ImageData {
     if (!mapInit || !myMap || !myMap.map || myOriginLat === null) return;
     let myOriginPx = myMap.latLngToPixel(myOriginLat, myOriginLon);
     let scale = Math.pow(2, myMap.map.getZoom() - zoom);
-    this.x = myOriginPx.x - this.headOffsetX * scale;
-    this.y = myOriginPx.y - this.headOffsetY * scale;
+    this.x = myOriginPx.x;
+    this.y = myOriginPx.y;
     this.w = size * scale;
     this.h = size * (this.img.height / this.img.width) * scale;
   }
