@@ -173,7 +173,15 @@ function onMapChange() {
 
 function gpsToScreen(traceData, lat, lon) {
   if (!mapInit || !myMap || !myMap.map || !traceData.originLat) return null;
-  return myMap.latLngToPixel(lat, lon);
+
+  let scale = Math.pow(2, myMap.map.getZoom() - zoom);
+  let originPx = myMap.latLngToPixel(traceData.originLat, traceData.originLon);
+  let pointPx = myMap.latLngToPixel(lat, lon);
+
+  return {
+    x: pointPx.x - traceData.headOffsetX * scale,
+    y: pointPx.y - traceData.headOffsetY * scale,
+  };
 }
 
 function addPointToTrace(traceData, lat, lon) {
