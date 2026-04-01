@@ -192,32 +192,26 @@ function gpsToScreen(traceData, lat, lon) {
   };
 }
 
-function gpsToScreenRaw(originLat, originLon, lat, lon) {
-  if (!mapInit || !myMap || !myMap.map || myOriginLat === null) return null;
-  let originPx = myMap.latLngToPixel(originLat, originLon);
-  let pointPx  = myMap.latLngToPixel(lat, lon);
-  let myOriginPx = myMap.latLngToPixel(myOriginLat, myOriginLon);
-  return {
-    x: myOriginPx.x + (pointPx.x - originPx.x),
-    y: myOriginPx.y + (pointPx.y - originPx.y),
-  };
+function addPointToTrace(traceData, lat, lon) {
+  let last = traceData.points[traceData.points.length - 1];
+  if (
+    last &&
+    Math.abs(last.lat - lat) < 1e-7 &&
+    Math.abs(last.lon - lon) < 1e-7
+  )
+    return;
+  traceData.points.push({ lat, lon });
+  if (mapInit && traceData.originLat) {
+    let px = gpsToScreen(traceData, lat, lon);
+    if (px) traceData.pxPoints.push(px);
+  }
 }
 
 function recalcTrace(traceData) {
   if (!mapInit || !traceData.originLat) return;
   traceData.pxPoints = traceData.points
-    .map((p) => gpsToScreenRaw(traceData.originLat, traceData.originLon, p.lat, p.lon))
+    .map((p) => gpsToScreen(traceData, p.lat, p.lon))
     .filter(Boolean);
-}
-
-function addPointToTrace(traceData, lat, lon) {
-  let last = traceData.points[traceData.points.length - 1];
-  if (last && Math.abs(last.lat - lat) < 1e-7 && Math.abs(last.lon - lon) < 1e-7) return;
-  traceData.points.push({ lat, lon });
-  if (mapInit && traceData.originLat) {
-    let px = gpsToScreenRaw(traceData.originLat, traceData.originLon, lat, lon);
-    if (px) traceData.pxPoints.push(px);
-  }
 }
 
 // ── Socket events ──────────────────────────────────────────────
