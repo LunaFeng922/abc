@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <link rel="manifest" href="manifest.json" />
+  <title>pC-test</title>
+  <link rel="stylesheet" type="text/css" href="startScreen.css">
+  <script src="lib/p5.js"></script>
+</head>
+
+<body>
+  <div class="main-wrapper">
+    <div id="center-container">
+      <form id="nameForm">
+        <input id="newName" placeholder="your name" autocomplete="off" />
+
+        <select id="yearSelect">
+          <option value="" disabled selected>year</option>
+          <option value="0">Freshman</option>
+          <option value="1">Sophomore</option>
+          <option value="2">Junior</option>
+          <option value="3">Senior</option>
+        </select>
+
+        <select id="semesterSelect">
+          <option value="" disabled selected>where in the year</option>
+        </select>
+
+        <button id="enterButton" type="submit">Enter</button>
+      </form>
+    </div>
+
+    <div id="preview-canvas-container"></div>
+  </div>
+
+  <script src="slotPath.js"></script>
+  <script src="landingScript.js"></script>
+  <script src="previewSketch.js"></script>
+</body>
+
+</html>

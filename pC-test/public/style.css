@@ -1,0 +1,90 @@
+body {
+    margin: 0;
+    background-color: white;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.compose-bubble {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background-color: #bde0fe;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    box-sizing: border-box;
+    gap: 12px;
+}
+
+#composeText {
+    width: 100%;
+    height: 100px;
+    border: none;
+    background-color: transparent;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 1em;
+    text-align: center;
+}
+
+.compose-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.compose-buttons button {
+    padding: 6px 16px;
+    color: #55555575;
+    border: 1px solid #55555575;
+    background-color: white;
+    font-family: inherit;
+    font-size: 0.9em;
+}
+
+.read-bubble {
+    width: 280px;
+    min-height: 280px;
+    max-height: 80vh;
+    border-radius: 50%;
+    background-color: #bde0fe;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    box-sizing: border-box;
+    gap: 12px;
+    overflow: hidden;
+}
+
+#readText {
+    font-size: 1em;
+    text-align: center;
+    word-break: break-word;
+    overflow-y: auto;
+    max-height: 180px;
+}
+
+#readAuthor {
+    font-size: 0.85em;
+    color: #555;
+    font-style: italic;
+}

@@ -1,0 +1,42 @@
+body {
+    margin: 0;
+    background-color: white;
+}
+
+#center-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    z-index: 2;
+}
+
+#nameForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#nameForm input,
+#nameForm button,
+#nameForm select {
+    font-size: 1em;
+    padding: 6px 10px;
+    border: 1px solid #999;
+    background-color: rgba(255, 255, 255, 0.707);
+    font-family: inherit;
+    color: rgb(126, 126, 126);
+}
+
+#preview-canvas-container {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
+}
