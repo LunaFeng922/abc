@@ -1,6 +1,7 @@
 const express = require('express');
 const https = require("https");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const portHTTPS = 4240;
@@ -19,25 +20,41 @@ const io = new Server(HTTPSserver);
 
 let sockets = {};
 
-// every memo: { id, slot, authorId, authorName, text, x, y }
-let memos = [];
-const DATA_FILE = "userData.json";
+const dataFile = path.join(__dirname, "public", "mapData.json");
 
+let mapData;
 try {
-    let dataText = fs.readFileSync(DATA_FILE, "utf8");
-    let parsed = JSON.parse(dataText);
-    if (Array.isArray(parsed)) {
-        memos = parsed;
-    } else if (parsed && Array.isArray(parsed.memos)) {
-        memos = parsed.memos;
+    let dataText = fs.readFileSync(dataFile, "utf8");
+    mapData = JSON.parse(dataText);
+    for (let s of mapData.slots) {
+        if (!Array.isArray(s.memos)) s.memos = [];
     }
 } catch (err) {
-    memos = [];
+    console.error("Could not load", dataFile, "- run `node generateMap.js` first");
+    process.exit(1);
 }
 
-function saveMemos() {
-    let dataAsText = JSON.stringify({ memos: memos }, null, 2);
-    fs.writeFileSync(DATA_FILE, dataAsText, 'utf8');
+function saveMap() {
+    let dataAsText = JSON.stringify(mapData, null, 2);
+    fs.writeFileSync(dataFile, dataAsText, 'utf8');
+}
+
+function getAllMemos() {
+    let all = [];
+    for (let s of mapData.slots) {
+        for (let m of s.memos) {
+            all.push({
+                id: m.id,
+                slot: s.index,
+                authorId: m.authorId,
+                authorName: m.authorName,
+                text: m.text,
+                branchPoints: m.branchPoints,
+                createdAt: m.createdAt
+            });
+        }
+    }
+    return all;
 }
 
 // socket communication
@@ -53,7 +70,7 @@ io.on('connection', (socket) => {
         socket.emit("all-users", allUsers);
 
         // send all existing memos to the new user
-        socket.emit("all-memos", memos);
+        socket.emit("all-memos", getAllMemos());
 
         // new user joined, notify others
         socket.broadcast.emit("user-joined", data);
@@ -77,23 +94,26 @@ io.on('connection', (socket) => {
         }
 
         if (!memo || typeof memo.text !== "string" || !memo.text.trim()) return;
-        if (typeof memo.slot !== "number" || memo.slot < 1 || memo.slot > 1000) return;
 
-        let cleanMemo = {
+        let slotIdx = memo.slot - 1;
+        if (typeof memo.slot !== "number" || slotIdx < 0 || slotIdx >= mapData.slots.length) return;
+
+        let storedMemo = {
             id: memo.id,
-            slot: memo.slot,
             authorId: userData.userId,
             authorName: userData.username,
             text: memo.text.trim(),
-            x: (typeof memo.x === "number") ? memo.x : 0.5,
-            y: (typeof memo.y === "number") ? memo.y : 0.5,
+            branchPoints: memo.branchPoints || [],
             createdAt: Date.now()
         };
 
-        memos.push(cleanMemo);
-        saveMemos();
+        mapData.slots[slotIdx].memos.push(storedMemo);
+        saveMap();
 
-        io.emit("memo-added", cleanMemo);
+        io.emit("memo-added", {
+            ...storedMemo,
+            slot: memo.slot
+        });
     });
 
     socket.on("disconnect", function () {

@@ -1,0 +1,12 @@
+{
+  "name": "imaRiver",
+  "icons": [
+    {
+      "src": "assets/imaRiver.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "orientation": "Natural",
+  "display": "standalone"
+}

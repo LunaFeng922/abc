@@ -1,8 +1,6 @@
-const TOTAL_SLOTS = 1000;
-const SLOTS_PER_SCREEN = 30;
-const Y_SPAN = TOTAL_SLOTS / SLOTS_PER_SCREEN;
+const totalSlots = 1000;
 
-const YEARS = ["Freshman", "Sophomore", "Junior", "Senior"];
+const years = ["Freshman", "Sophomore", "Junior", "Senior"];
 
 function seededRandom(seed) {
     let x = Math.sin(seed) * 10000;
@@ -51,13 +49,13 @@ let stageName;
     let stageStart, stageEnd;
     let stageWeight;
     if (isBreak) {
-        stageName = "Break";       stageStart = 1;  stageEnd = 17;  stageWeight = 4;
+        stageName = "Break";       stageStart = 1;  stageEnd = 17;  stageWeight = 2;
     } else {
-        if (period <= 15)        { stageName = "Start";     stageStart = 1;  stageEnd = 15;  stageWeight = 4.5;  }
-        else if (period <= 44)   { stageName = "Start-Mid"; stageStart = 16; stageEnd = 44;  stageWeight = 5;  }
-        else if (period <= 64)   { stageName = "Mid";       stageStart = 45; stageEnd = 64;  stageWeight = 5.5;  }
-        else if (period <= 85)   { stageName = "Mid-Final"; stageStart = 65; stageEnd = 85;  stageWeight = 5;  }
-        else                     { stageName = "Final";     stageStart = 86; stageEnd = 110; stageWeight = 6; }
+        if (period <= 15)        { stageName = "Start";     stageStart = 1;  stageEnd = 15;  stageWeight = 2.5;  }
+        else if (period <= 44)   { stageName = "Start-Mid"; stageStart = 16; stageEnd = 44;  stageWeight = 3;  }
+        else if (period <= 64)   { stageName = "Mid";       stageStart = 45; stageEnd = 64;  stageWeight = 3.5;  }
+        else if (period <= 85)   { stageName = "Mid-Final"; stageStart = 65; stageEnd = 85;  stageWeight = 3;  }
+        else                     { stageName = "Final";     stageStart = 86; stageEnd = 110; stageWeight = 4; }
     }
 
     let yearOffset = yearIdx * 254;
@@ -69,7 +67,7 @@ let stageName;
 
     return {
         graduated: false,
-        yearName: YEARS[yearIdx],
+        yearName: years[yearIdx],
         semLabel: semLabel,
         stageName: stageName,
         stageWeight: stageWeight, 
@@ -95,19 +93,14 @@ function getSlotBuckets(slot) {
 
 function generateSlotPoses() {
     let poses = [];
-    let baseStep = Y_SPAN / TOTAL_SLOTS;
+    let baseStep = 1/30;
 
     let cursorX = 0.5;
     let cursorY = 0.1;
 
     let prevYearIdx = -1;
 
-    // how much each layer can twist the direction (in degrees, ±range)
-    let YEAR_ANGLE_RANGE  = 15;
-    let SEG_ANGLE_RANGE   = 30;
-    let STAGE_ANGLE_RANGE = 60;
-
-    for (let i = 0; i < TOTAL_SLOTS; i++) {
+    for (let i = 0; i < totalSlots; i++) {
         let slot = i + 1;
         let info = getSlotInfo(slot);
 
@@ -120,13 +113,13 @@ function generateSlotPoses() {
         let buckets = getSlotBuckets(slot);
 
         // each layer contributes a direction twist
-        let yearSeed   = buckets.yearIdx * 100 + 1;
+        let yearseed   = buckets.yearIdx * 100 + 1;
         let segSeed    = buckets.yearIdx * 10 + buckets.segIdx + 200;
         let stageSeed  = buckets.stageKey;
 
-        let yearAngle  = (seededRandom(yearSeed)  - 0.5) * 2 * YEAR_ANGLE_RANGE;
-        let segAngle   = (seededRandom(segSeed)   - 0.5) * 2 * SEG_ANGLE_RANGE;
-        let stageAngle = (seededRandom(stageSeed) - 0.5) * 2 * STAGE_ANGLE_RANGE;
+        let yearAngle  = (seededRandom(yearseed)  - 0.5) * 2 * 15;
+        let segAngle   = (seededRandom(segSeed)   - 0.5) * 2 * 30;
+        let stageAngle = (seededRandom(stageSeed) - 0.5) * 2 * 60;
 
         let angleRad = ((yearAngle + segAngle + stageAngle) * Math.PI) / 180;
         let stepDx = Math.sin(angleRad);
@@ -154,9 +147,24 @@ function generateSlotPoses() {
         });
     }
 
-    poses[TOTAL_SLOTS - 1].y += 2;
-
     return poses;
 }
 
 let slotPoses = generateSlotPoses();
+
+function generateExtension(anchorPose, awayDir) {
+    let pts = [];
+    let stepY = 0.5 / 5;
+    for (let i = 1; i <= 5; i++) {
+        let wanderX = (seededRandom(i + 7000 + awayDir) - 0.5) * 0.06;
+        let wanderY = (seededRandom(i + 7500 + awayDir) - 0.5) * 0.04;
+        pts.push({
+            x: anchorPose.x + wanderX,
+            y: anchorPose.y + awayDir * (stepY * i + wanderY)
+        });
+    }
+    return pts;
+}
+
+let extensionStart = generateExtension(slotPoses[0], -1).reverse();
+let extensionEnd = generateExtension(slotPoses[slotPoses.length - 1], 1);

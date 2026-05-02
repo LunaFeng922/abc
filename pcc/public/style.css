@@ -23,7 +23,7 @@ body {
     width: 280px;
     height: 280px;
     border-radius: 50%;
-    background-color: #bde0fe;
+    background-color: rgb(96, 165, 250);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -43,6 +43,12 @@ body {
     font-family: inherit;
     font-size: 1em;
     text-align: center;
+    color: #f3f3f3;
+}
+
+#composeText::placeholder {
+    font-style: italic;
+    color: #f3f3f399;
 }
 
 .compose-buttons {
@@ -52,9 +58,9 @@ body {
 
 .compose-buttons button {
     padding: 6px 16px;
-    color: #55555575;
-    border: 1px solid #55555575;
-    background-color: white;
+    color: #ffffff;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.291);
     font-family: inherit;
     font-size: 0.9em;
 }
@@ -64,7 +70,7 @@ body {
     min-height: 280px;
     max-height: 80vh;
     border-radius: 50%;
-    background-color: #bde0fe;
+    background-color: rgb(96, 165, 250);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -81,10 +87,11 @@ body {
     word-break: break-word;
     overflow-y: auto;
     max-height: 180px;
+    color: #f3f3f3;
 }
 
 #readAuthor {
     font-size: 0.85em;
-    color: #555;
+    color: #f3f3f3;
     font-style: italic;
 }

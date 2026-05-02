@@ -1,4 +1,4 @@
-let formeElm = document.querySelector("#nameForm");
+let formeElm = document.querySelector("#infoForm");
 let nameInput = document.querySelector("#newName");
 let yearSelect = document.querySelector("#yearSelect");
 let semesterSelect = document.querySelector("#semesterSelect");
@@ -8,7 +8,7 @@ let userPosKEY = "user-pos";
 let userYearKEY = "user-year";
 let userSemesterKEY = "user-semester";
 
-const GRADUATED_SLOT = 1000;
+const graduatedSlot = 1000;
 
 // semesterSelect has 4 options; the last one changes based on year
 // sem value codes:
@@ -27,7 +27,7 @@ function rebuildSemesterOptions() {
     placeholder.value = "";
     placeholder.disabled = true;
     placeholder.selected = true;
-    placeholder.innerText = "where in the year";
+    placeholder.innerText = "**";
     semesterSelect.appendChild(placeholder);
 
     let options = [
@@ -62,7 +62,7 @@ semesterSelect.addEventListener("change", function () {
     if (typeof refreshPreview === "function") refreshPreview();
 });
 
-// Pre-fill from localStorage
+// prefill from local storage
 let existingName = localStorage.getItem(usernameKEY);
 if (existingName) nameInput.value = existingName;
 
@@ -165,7 +165,7 @@ function computeBreakPeriod() {
 }
 
 function computeSlot(year, sem) {
-    if (year === 3 && sem === 3) return GRADUATED_SLOT;
+    if (year === 3 && sem === 3) return graduatedSlot;
 
     let yearOffset = year * 254;
     let segOffset, period;

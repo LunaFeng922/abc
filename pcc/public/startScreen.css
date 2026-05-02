@@ -25,7 +25,7 @@ body {
 #nameForm select {
     font-size: 1em;
     padding: 6px 10px;
-    border: 1px solid #999;
+    border: 1px solid #99999944;
     background-color: rgba(255, 255, 255, 0.707);
     font-family: inherit;
     color: rgb(126, 126, 126);

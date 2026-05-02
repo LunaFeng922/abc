@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="manifest" href="manifest.json" />
+    <title>imaRiver</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="lib/p5.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <div id="p5-canvas-container"></div>
+    </div>
+
+    <div id="composeOverlay" class="overlay hidden">
+        <div class="compose-bubble">
+            <textarea id="composeText" placeholder="grow a river..."></textarea>
+
+            <div class="action-container">
+                <button id="cancelBtn" class="action-btn" type="button">- cancel -</button>
+                <button id="addBtn" class="action-btn" type="button">+ add +</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="readOverlay" class="overlay hidden">
+        <div class="read-bubble">
+            <div id="readCounter">1/1</div>
+
+            <button id="prevMemoBtn" class="nav-btn">《</button>
+            <button id="nextMemoBtn" class="nav-btn">》</button>
+
+            <div class="read-content">
+                <div id="readText"></div>
+            </div>
+
+            <div id="readAuthor"></div>
+
+        </div>
+    </div>
+
+    <script src="slotPath.js"></script>
+    <script src="sketch.js"></script>
+</body>
+
+</html>
