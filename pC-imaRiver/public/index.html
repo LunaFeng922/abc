@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <link rel="manifest" href="manifest.json" />
+  <title>imaRiver</title>
+  <link rel="stylesheet" type="text/css" href="startScreen.css">
+  <script src="lib/p5.js"></script>
+</head>
+
+<body>
+  <div class="main-wrapper">
+    <div id="center-container">
+      <form id="infoForm">
+
+        <div class="input-wrapper" data-left="IM">
+          <input id="newName" placeholder="**" autocomplete="off" />
+        </div>
+
+        <div class="input-wrapper" data-left="A">
+          <select id="yearSelect">
+            <option value="" disabled selected>**</option>
+            <option value="0">freshman</option>
+            <option value="1">sophomore</option>
+            <option value="2">junior</option>
+            <option value="3">senior</option>
+          </select>
+        </div>
+
+        <select id="semesterSelect">
+          <option value="" disabled selected>**</option>
+        </select>
+
+        <div class="input-wrapper" data-right="River">
+          <button id="enterButton" type="submit">flow in</button>
+        </div>
+
+      </form>
+    </div>
+
+    <div id="preview-canvas-container"></div>
+  </div>
+
+  <script src="slotPath.js"></script>
+  <script src="landingScript.js"></script>
+  <script src="preview.js"></script>
+</body>
+
+</html>
