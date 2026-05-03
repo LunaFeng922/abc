@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+
+    <link rel="manifest" href="/manifest.json" />
+
+    <title>pyq</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <script src="../lib/p5.js"></script>
+    <script src="../lib/p5.sound.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+    <!-- include socket.io library: -->
+    <!-- <script src="/socket.io/socket.io.js"></script>  -->
+  </head>
+
+  <body>
+    <div id="main-wrapper">
+      <div id="user-nameWrapper">
+        <p>Enter your name to begin</p>
+
+        <input
+          type="text"
+          id="userNameInput"
+          maxlength="16"
+          placeholder="Your Name"
+        />
+
+        <button id="userNameButton">Start</button>
+      </div>
+
+      <div id="captureArea" style="display: none">
+        <p id="instruction-text">📸 fit your face in the circle, then snap!</p>
+
+        <div id="canvas-wrapper"></div>
+        <button id="captureButton">SNAP!</button>
+
+        <div id="pen-tools">
+          <div id="pen-top-row">
+            <input type="color" id="color-picker" value="#000000" />
+            <!-- <div id="pen-preview"></div> -->
+            <input type="range" id="size-slider" min="2" max="40" value="20" />
+          </div>
+          <div id="tool-buttons">
+            <button
+              class="shape-btn active"
+              id="btn-line"
+              onclick="changeShape('line')"
+            >
+              ——
+            </button>
+            <button
+              class="shape-btn"
+              id="btn-strokeCircle"
+              onclick="changeShape('strokeCircle')"
+            >
+              ○
+            </button>
+            <button
+              class="shape-btn"
+              id="btn-circle"
+              onclick="changeShape('circle')"
+            >
+              ●
+            </button>
+            <button id="eraser-btn">Eraser</button>
+            <button id="clear-btn">Clear</button>
+          </div>
+        </div>
+
+        <div id="pet-name-input-wrapper" style="display: none">
+          <input id="pet-name-input" placeholder="name your pet..." />
+        </div>
+
+        <button id="preview-button" style="display: none">Save Frame 1</button>
+        <button id="sendButton">send →</button>
+      </div>
+    </div>
+    <!-- 
+      <div id="album">
+        <button id="deleteButton">delete</button>
+        <p>album</p>
+        <div id="images"></div>
+      </div>
+    </div> -->
+
+    <audio
+      id="camSound"
+      src="/231286__ulose2piranha__5dmkii-shutter-sound.wav"
+    ></audio>
+    <!-- the script tag below should always be at the bottom, right before the closing body tag -->
+    <script src="script.js"></script>
+  </body>
+</html>

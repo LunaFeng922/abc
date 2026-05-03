@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <title>Poop Run</title>
+    <script src="../../lib/p5.js"></script>
+    <script src="../../lib/p5.sound.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+  </head>
+
+  <body>
+    <div id="ui">
+      <button id="back-btn" onclick="location.href = '/playground'">
+        ← back
+      </button>
+      <div id="lap-text">lap: 0%</div>
+    </div>
+
+    <div id="result">
+      <div id="result-box">
+        <h2 id="result-emoji">💩</h2>
+        <div class="score" id="result-score">0%</div>
+        <div class="result-stat" id="result-weight">⚖️ -0 weight</div>
+        <div class="result-stat" id="result-happy">😊 +0 happy</div>
+        <p id="result-msg" style="color: #666; font-size: 14px">on target!</p>
+        <button onclick="retryGame()">Try Again</button>
+        <button
+          class="back-link"
+          onclick="window.location.href = '/playground'"
+        >
+          Back to Playground
+        </button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

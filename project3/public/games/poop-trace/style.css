@@ -1,0 +1,99 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Pixelify Sans", sans-serif;
+}
+body {
+  overflow: hidden;
+  background: #a8e6cf;
+  touch-action: none;
+  font-family: "Pixelify Sans", sans-serif;
+}
+canvas {
+  display: block;
+}
+
+#ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+#ui button {
+  pointer-events: all;
+}
+
+#lap-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+#back-btn {
+  font-size: 14px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+
+#result {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+#result.show {
+  display: flex;
+}
+#result-box {
+  background: white;
+  border-radius: 20px;
+  padding: 36px 40px;
+  text-align: center;
+  font-family: "Pixelify Sans", sans-serif;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+#result-box h2 {
+  font-size: 28px;
+}
+#result-box .score {
+  font-size: 52px;
+  font-weight: bold;
+  color: #4caf50;
+}
+#result-box .stars {
+  font-size: 32px;
+}
+#result-box button {
+  padding: 12px 28px;
+  border-radius: 12px;
+  border: none;
+  background: #4caf50;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+}
+#result-box .back-link {
+  background: #eee;
+  color: #333;
+}

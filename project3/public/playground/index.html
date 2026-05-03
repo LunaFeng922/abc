@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Playground</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script src="../lib/p5.js"></script>
+    <script src="../lib/p5.sound.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+
+
+    <div id="top-bar">
+      <span id="top-title">IN THE IMA GARDEN </span>
+    </div>
+
+    <div id="canvas-wrapper"></div>
+
+    <div id="toolbar">
+      <!-- <button class="tool-btn" id="chat-btn" onclick="selectTool('chat')">
+        💬
+      </button> -->
+          <button class="tool-btn" id="board-btn" onclick="selectTool('board')">
+        📜
+      </button>
+       <button class="tool-btn" id="game-btn" onclick="selectTool('game')">
+        🕹️
+      </button>
+     
+      <button class="tool-btn" id="love-btn" onclick="selectTool('love')">
+        💕
+      </button>
+      <button class="tool-btn" id="feed-btn" onclick="selectTool('feed')">
+        🍖
+      </button>
+      <button class="tool-btn" id="poop-btn" onclick="selectTool('poop')">
+        🪏
+      </button>
+     
+   
+      <button
+        class="tool-btn"
+        id="recorder-btn"
+        onclick="selectTool('recorder')"
+      >
+        🎙️
+      </button>
+      <button
+        class="tool-btn"
+        id="settings-btn"
+        onclick="selectTool('settings')"
+      >
+        ⚙️
+      </button>
+    </div>
+
+    <div id="food-picker" style="display: none">
+      <button class="food-option" onclick="selectFood('🍖')">🍖</button>
+      <button class="food-option" onclick="selectFood('🍣')">🍣</button>
+      <button class="food-option" onclick="selectFood('🥗')">🥗</button>
+      <button class="food-option" onclick="selectFood('🍔')">🍔</button>
+    </div>
+
+    <div id="board-panel" style="display: none">
+      <div id="board-header">
+        <span>📋 Activity</span>
+        <button id="board-close" onclick="selectTool('board')">✕</button>
+      </div>
+      <div id="record-list"></div>
+    </div>
+
+    <div id="audio-panel" style="display: none">
+      <div id="audio-header">
+        <span>🎙️ Record Audio</span>
+        <button id="audio-close">✕</button>
+      </div>
+      <div id="audio-content">
+        <div class="sound-row">
+          <div class="sound-label">
+            When <strong class="my-pet-name">your pet</strong> eats 🍖
+          </div>
+          <div class="rec-controls">
+            <button class="mic-btn" data-type="eat">🎙️</button>
+            <div class="countdown-display" style="display: none">3</div>
+            <div class="waveform" style="display: none">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <button class="stop-rec-btn" data-type="eat" style="display: none">
+              ⏹
+            </button>
+          </div>
+          <div class="sound-preview-area" id="preview-eat">
+            <span class="no-sound">not recorded yet</span>
+          </div>
+        </div>
+
+        <div class="sound-row">
+          <div class="sound-label">
+            When <strong class="my-pet-name">your pet</strong> poops 💩
+          </div>
+          <div class="rec-controls">
+            <button class="mic-btn" data-type="poop">🎙️</button>
+            <div class="countdown-display" style="display: none">3</div>
+            <div class="waveform" style="display: none">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <button class="stop-rec-btn" data-type="poop" style="display: none">
+              ⏹
+            </button>
+          </div>
+          <div class="sound-preview-area" id="preview-poop">
+            <span class="no-sound">not recorded yet</span>
+          </div>
+        </div>
+
+        <div class="sound-row">
+          <div class="sound-label">
+            When someone clicked on <strong class="my-pet-name">your pet</strong>
+          </div>
+          <div class="rec-controls">
+            <button class="mic-btn" data-type="greet">🎙️</button>
+            <div class="countdown-display" style="display: none">3</div>
+            <div class="waveform" style="display: none">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <button class="stop-rec-btn" data-type="greet" style="display: none">
+              ⏹
+            </button>
+          </div>
+          <div class="sound-preview-area" id="preview-greet">
+            <span class="no-sound">not recorded yet</span>
+          </div>
+        </div>
+
+        <p id="upload-status"></p>
+      </div>
+    </div>
+
+    <div id="settings-panel" style="display: none">
+      <div id="settings-header">
+        <span>⚙️ Settings</span>
+        <button id="settings-close" onclick="selectTool('settings')">✕</button>
+      </div>
+      <div id="settings-content">
+        <div class="settings-row">
+          <label>👤 Username</label>
+          <input
+            id="settings-username"
+            type="text"
+            maxlength="16"
+            placeholder="your name"
+          />
+          <button id="settings-save-name">Save</button>
+        </div>
+        <div class="settings-row">
+          <label>🖼️ Background</label>
+          <div id="bg-slider">
+            <button class="bg-btn active" data-bg="assets/pixel-grass.jpg">
+              <img src="assets/pixel-grass.jpg" />
+              <span>Grass</span>
+            </button>
+            <button class="bg-btn" data-bg="assets/windows-sky.jpg">
+              <img src="assets/windows-sky.jpg" />
+              <span>Windows</span>
+              <button class="bg-btn" data-bg="assets/fourth-studio.JPG">
+                <img src="assets/fourth-studio.JPG" />
+                <span>Studio</span>
+              </button>
+              <button class="bg-btn" data-bg="assets/sea4.png">
+                <img src="assets/sea4.png" />
+                <span>Ocean</span>
+                <button class="bg-btn" data-bg="assets/toilet.png">
+                <img src="assets/toilet.png" />
+                <span>Toilet</span>
+              </button>
+            </button>
+            <button class="bg-btn" data-bg="">
+              <div class="bg-plain"></div>
+              <span>Plain</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="recorder.js"></script>
+  </body>
+</html>

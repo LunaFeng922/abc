@@ -1,0 +1,260 @@
+[
+  {
+    "userId": "043da26f-cf6b-4893-906d-f33aef3338f6",
+    "username": "a",
+    "petName": "小天才",
+    "front1": "uploads/1777752393952.png",
+    "front2": "uploads/1777752394104.png",
+    "left1": "uploads/1777752394241.png",
+    "left2": "uploads/1777752394359.png",
+    "right1": "uploads/1777752394457.png",
+    "right2": "uploads/1777752394547.png",
+    "stats": {
+      "hunger": 0,
+      "happy": 0,
+      "age": 0,
+      "weight": 45
+    },
+    "x": 30.198365941823795,
+    "y": 420.5207002508931,
+    "vx": 1,
+    "vy": 5.477680303709762,
+    "wanderAngle": 7.004822249514849,
+    "restTimer": 0,
+    "lastPoopTime": 1777834771904,
+    "sounds": {
+      "eat": "uploads-audio/1777753603524.mp3"
+    },
+    "meetingTimer": 4,
+    "meetingFacing": 1
+  },
+  {
+    "userId": "df3cb2b9-f1cf-4379-90c4-a44f379fb96d",
+    "username": "dreamybot",
+    "petName": "粉色小公主",
+    "front1": "uploads/1777753518265.png",
+    "front2": "uploads/1777753518281.png",
+    "left1": "uploads/1777753518293.png",
+    "left2": "uploads/1777753518310.png",
+    "right1": "uploads/1777753518327.png",
+    "right2": "uploads/1777753518344.png",
+    "stats": {
+      "hunger": 0,
+      "happy": 0,
+      "age": 0,
+      "weight": 55
+    },
+    "x": 201.7679683628118,
+    "y": 52.65137004784177,
+    "vx": -4.234103350487528,
+    "vy": -5.890107642899684,
+    "wanderAngle": 48.07142092610606,
+    "restTimer": 0,
+    "lastPoopTime": 1777835131905,
+    "sounds": {
+      "eat": "uploads-audio/1777753545001.mp3"
+    },
+    "meetingTimer": 0,
+    "meetingFacing": 0
+  },
+  {
+    "userId": "d854f2ca-7c63-4be8-9cd2-213b2d79b881",
+    "username": "dreamybot",
+    "petName": "透明雪纺公主",
+    "front1": "uploads/1777784232557.png",
+    "front2": "uploads/1777784232575.png",
+    "left1": "uploads/1777784232588.png",
+    "left2": "uploads/1777784232606.png",
+    "right1": "uploads/1777784232621.png",
+    "right2": "uploads/1777784232640.png",
+    "stats": {
+      "hunger": 0,
+      "happy": 0,
+      "age": 0,
+      "weight": 60
+    },
+    "x": 720.4155707238425,
+    "y": 188.74310397386094,
+    "vx": 6.7901480660455364,
+    "vy": -2.552427955640091,
+    "wanderAngle": 81.32184805770164,
+    "restTimer": 0,
+    "lastPoopTime": 1777834591904,
+    "sounds": {
+      "eat": "uploads-audio/1777811501360.mp3"
+    },
+    "meetingTimer": 0,
+    "meetingFacing": 0
+  },
+  {
+    "userId": "03362ab3-3b1f-409c-a0ed-4dcc5e1ad8f5",
+    "username": "a",
+    "petName": "小生气",
+    "front1": "uploads/1777806508825.png",
+    "front2": "uploads/1777806508943.png",
+    "left1": "uploads/1777806509029.png",
+    "left2": "uploads/1777806509275.png",
+    "right1": "uploads/1777806509351.png",
+    "right2": "uploads/1777806509437.png",
+    "stats": {
+      "hunger": 0,
+      "happy": 0,
+      "age": 0,
+      "weight": 44
+    },
+    "x": 110.1983659418238,
+    "y": 442.54285895310704,
+    "vx": -1,
+    "vy": -1.119282994660756,
+    "wanderAngle": 68.97466748081148,
+    "restTimer": 0,
+    "lastPoopTime": 1777835131906,
+    "sounds": {
+      "eat": "uploads-audio/1777811147188.mp3",
+      "poop": "uploads-audio/1777807635358.mp3",
+      "greet": "uploads-audio/1777827546172.mp3"
+    },
+    "meetingTimer": 4,
+    "meetingFacing": -1
+  },
+  {
+    "userId": "763baabe-29cd-41d7-a661-723d638afb44",
+    "username": "店小二",
+    "petName": "诸葛刘明",
+    "front1": "uploads/1777830047097.png",
+    "front2": "uploads/1777830047255.png",
+    "left1": "uploads/1777830047434.png",
+    "left2": "uploads/1777830047559.png",
+    "right1": "uploads/1777830047669.png",
+    "right2": "uploads/1777830047783.png",
+    "stats": {
+      "hunger": 0,
+      "happy": 0,
+      "age": 0,
+      "weight": 40
+    },
+    "x": 522.4732646674622,
+    "y": 442.7462601864386,
+    "vx": -1,
+    "vy": 3.228139696801584,
+    "wanderAngle": -28.67422418796154,
+    "restTimer": 46,
+    "lastPoopTime": 1777835131906,
+    "meetingTimer": 0,
+    "meetingFacing": 0
+  },
+  {
+    "userId": "1b20c978-7f81-4b2e-a0a7-43dc6c355f3d",
+    "username": "店小三",
+    "petName": "好",
+    "front1": "uploads/1777830995360.png",
+    "front2": "uploads/1777830995513.png",
+    "left1": "uploads/1777830995647.png",
+    "left2": "uploads/1777830995756.png",
+    "right1": "uploads/1777830995871.png",
+    "right2": "uploads/1777830995986.png",
+    "stats": {
+      "hunger": 0,
+      "happy": 0,
+      "age": 0,
+      "weight": 25
+    },
+    "x": 628.1869996344269,
+    "y": 166.55452962830793,
+    "vx": 7.541845559459892,
+    "vy": -6.566625126901574,
+    "wanderAngle": -25.84912612396818,
+    "restTimer": 38,
+    "lastPoopTime": 1777834951906,
+    "meetingTimer": 0,
+    "meetingFacing": 0
+  },
+  {
+    "userId": "588ff7f5-d05c-431d-8bb0-b5b1f14e7dec",
+    "username": "GoD ehT",
+    "petName": "Bee Mao",
+    "front1": "uploads/1777834333263.png",
+    "front2": "uploads/1777834333372.png",
+    "left1": "uploads/1777834333432.png",
+    "left2": "uploads/1777834333493.png",
+    "right1": "uploads/1777834333542.png",
+    "right2": "uploads/1777834333592.png",
+    "stats": {
+      "hunger": 31,
+      "happy": 20,
+      "age": 0,
+      "weight": 35
+    },
+    "x": 445.46073400314344,
+    "y": 231.65379651740759,
+    "vx": 1.4249530086255564,
+    "vy": -8.557619371829189,
+    "wanderAngle": -7.688982685947993,
+    "restTimer": 0,
+    "lastPoopTime": 1777835131906,
+    "meetingTimer": 0,
+    "meetingFacing": 0,
+    "sounds": {
+      "eat": "uploads-audio/1777834372061.mp3",
+      "poop": "uploads-audio/1777834400427.mp3",
+      "greet": "uploads-audio/1777834418589.mp3"
+    }
+  },
+  {
+    "userId": "b0781f67-35e3-4811-a217-ac10fd07ea19",
+    "username": "luna女神",
+    "petName": "小luna",
+    "front1": "uploads/1777834350444.png",
+    "front2": "uploads/1777834350656.png",
+    "left1": "uploads/1777834350739.png",
+    "left2": "uploads/1777834350830.png",
+    "right1": "uploads/1777834350885.png",
+    "right2": "uploads/1777834350940.png",
+    "stats": {
+      "hunger": 61,
+      "happy": 21,
+      "age": 0,
+      "weight": 55
+    },
+    "x": 427.07224050518874,
+    "y": 462.4259213671126,
+    "vx": -1.5350318069186832,
+    "vy": 7.426824539389501,
+    "wanderAngle": 26.907355057722555,
+    "restTimer": 0,
+    "lastPoopTime": 1777834771905,
+    "meetingTimer": 0,
+    "meetingFacing": 0,
+    "sounds": {
+      "eat": "uploads-audio/1777834465765.mp3",
+      "poop": "uploads-audio/1777834486241.mp3",
+      "greet": "uploads-audio/1777834502467.mp3"
+    }
+  },
+  {
+    "userId": "b0781f67-35e3-4811-a217-ac10fd07ea19",
+    "username": "luna女神",
+    "petName": "kisskiss",
+    "front1": "uploads/1777834878779.png",
+    "front2": "uploads/1777834878899.png",
+    "left1": "uploads/1777834879109.png",
+    "left2": "uploads/1777834879174.png",
+    "right1": "uploads/1777834879248.png",
+    "right2": "uploads/1777834879296.png",
+    "stats": {
+      "hunger": 74,
+      "happy": 74,
+      "age": 0,
+      "weight": 40
+    },
+    "x": 665.824375164586,
+    "y": 487.92219338713295,
+    "vx": 7.2846633933637985,
+    "vy": -3.960752614138422,
+    "wanderAngle": -6.781187397960594,
+    "restTimer": 0,
+    "lastPoopTime": 1777835131906,
+    "meetingTimer": 0,
+    "meetingFacing": 0
+  }
+]
