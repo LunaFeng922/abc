@@ -1,3 +1,10 @@
+function preload() {
+    loadJSON("mapData.json", data => {
+        applyMapData(data);
+        rebuildBranches(); 
+    });
+}
+
 let canvas;
 let branchDroplets = [];
 let highlightAncestry = {}; 
@@ -80,6 +87,10 @@ socket.on("memo-added", function (memo) {
 });
 
 function rebuildBranches() {
+    if (typeof slotPoses === 'undefined' || slotPoses.length === 0) {
+        return; 
+    }
+
     branchDroplets = [];
     slotIconPositions = {};
     for (let m of memos) {
@@ -127,7 +138,14 @@ function closeCompose() {
     composeText.blur();
 }
 
-// stop propagation for ui overlays
+[cancelBtn, addBtn].forEach(btn => {
+    btn.addEventListener("touchend", function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        btn.click();
+    });
+});
+
 [composeOverlay, cancelBtn, addBtn].forEach(el => {
     el.addEventListener("touchstart", e => e.stopPropagation());
 });
@@ -141,20 +159,38 @@ composeText.addEventListener("click", function (e) {
     composeText.focus();
 });
 
+composeText.addEventListener("blur", function () {
+    window.scrollTo(0, 0); 
+    document.body.scrollTop = 0; 
+});
+
+composeText.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        e.preventDefault(); 
+        composeText.blur(); 
+    }
+});
+
+composeOverlay.addEventListener("touchmove", function (e) {
+    if (e.target !== composeText) {
+        e.preventDefault(); 
+    }
+}, { passive: false });
+
 cancelBtn.addEventListener("click", closeCompose);
 
 function pickBranchStart(slotCenter) {
-    let candidates = [];
+    let potentialStartPoints = [];
     for (let b of branchDroplets) {
         if (b.memoData && b.memoData.slot === myPos && b.points.length >= 3) {
             for (let i = 1; i < b.points.length - 1; i++) {
-                candidates.push(b.points[i]);
+                potentialStartPoints.push(b.points[i]);
             }
         }
     }
 
-    if (candidates.length > 0 && Math.random() < 0.7) {
-        return candidates[Math.floor(Math.random() * candidates.length)];
+    if (potentialStartPoints.length > 0 && Math.random() < 0.7) {
+        return potentialStartPoints[Math.floor(Math.random() * potentialStartPoints.length)];
     }
     return slotCenter;
 }
@@ -180,7 +216,6 @@ addBtn.addEventListener("click", function () {
         }
     }
 
-    //user poses
     let angle = 0;
     let n = myPos;
     if (n === 1) {
@@ -268,7 +303,6 @@ function updateReadContent() {
     readText.innerText = memo.text;
     readCounter.innerText = (currentReadIndex + 1) + " / " + currentReadMemos.length;
     
-    // 用 classList.toggle 代替 style.visibility 修改，简化逻辑
     let shouldHide = currentReadMemos.length <= 1;
     prevMemoBtn.classList.toggle("invisible", shouldHide);
     nextMemoBtn.classList.toggle("invisible", shouldHide);
@@ -281,12 +315,18 @@ function closeRead() {
     currentHighlightMemoId = null; 
 }
 
-// Read overlay event blockers
+// read overlay event blockers
 let readBubble = document.querySelector(".read-bubble");
 readBubble.addEventListener("click", e => e.stopPropagation());
 readBubble.addEventListener("touchend", e => e.stopPropagation());
 
 readOverlay.addEventListener("touchstart", e => e.stopPropagation());
+
+readOverlay.addEventListener("touchmove", function (e) {
+    if (e.target !== readText) { 
+        e.preventDefault();
+    }
+}, { passive: false });
 
 readOverlay.addEventListener("touchend", function (e) {
     e.stopPropagation();
@@ -334,7 +374,9 @@ let swipeAnchorY = 0;
 const swipeUnit = 24;
 
 function touchStarted() {
-    if (!composeOverlay.classList.contains("hidden") || !readOverlay.classList.contains("hidden")) return;
+    if (!composeOverlay.classList.contains("hidden") || !readOverlay.classList.contains("hidden")) {
+        return; 
+    }
 
     let ty;
     if (touches.length > 0) {
@@ -348,7 +390,9 @@ function touchStarted() {
 }
 
 function touchMoved() {
-    if (!composeOverlay.classList.contains("hidden") || !readOverlay.classList.contains("hidden")) return;
+    if (!composeOverlay.classList.contains("hidden") || !readOverlay.classList.contains("hidden")) {
+        return; 
+    }
 
     let ty;
     if (touches.length > 0) {
@@ -374,13 +418,14 @@ function touchMoved() {
 }
 
 function touchEnded() {
-    if (!composeOverlay.classList.contains("hidden") || !readOverlay.classList.contains("hidden")) return;
+    if (!composeOverlay.classList.contains("hidden") || !readOverlay.classList.contains("hidden")) {
+        return; 
+    }
 
-    // Updated variable references
-    let camX = getCanvasCenterX();
-    let camY = getCanvasCenterY();
-    let worldEndX = mouseX - width / 2 + camX;
-    let worldEndY = mouseY - height / 2 + camY;
+    let viewCenterX = getCanvasCenterX();
+    let viewCenterY = getCanvasCenterY();
+    let worldEndX = mouseX - width / 2 + viewCenterX;
+    let worldEndY = mouseY - height / 2 + viewCenterY;
     
     let dy = mouseY - touchStartY;
     let totalMove = Math.abs(dy);
@@ -421,7 +466,7 @@ function changeMyPos(newPos) {
     socket.emit("user-move", { pos: myPos });
 }
 
-// ====== Canvas 视野焦点与平滑过渡 ======
+// canvas move
 let myFloatPos = null;
 let userFloatPos = {};   
 let canvasFocusX = null;
@@ -475,10 +520,6 @@ function getCanvasCenterY() {
 }
 
 //p5 setup and draw
-function preload() {
-    loadJSON("mapData.json", data => applyMapData(data));
-}
-
 function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
     canvas.parent("p5-canvas-container");
@@ -488,12 +529,11 @@ function setup() {
 function draw() {
     background(255);
 
-    // Updated references
     updateCanvasCenter();
-    let camX = getCanvasCenterX();
-    let camY = getCanvasCenterY();
-    let offsetX = width / 2 - camX;
-    let offsetY = height / 2 - camY;
+    let viewCenterX = getCanvasCenterX();
+    let viewCenterY = getCanvasCenterY();
+    let offsetX = width / 2 - viewCenterX;
+    let offsetY = height / 2 - viewCenterY;
 
     // ancestry tracing
     highlightAncestry = {};
@@ -510,14 +550,14 @@ function draw() {
                 while (dist(currP.x, currP.y, slotCenter.x, slotCenter.y) > 2.0 && loopCount < 100) {
                     loopCount++;
                     let foundParent = false;
-                    for (let cand of branchDroplets) {
-                        if (!cand.memoData || cand.memoData.slot !== hb.memoData.slot) continue;
-                        if (highlightAncestry[cand.memoData.id] !== undefined) continue; 
+                    for (let potentialParent of branchDroplets) {
+                        if (!potentialParent.memoData || potentialParent.memoData.slot !== hb.memoData.slot) continue;
+                        if (highlightAncestry[potentialParent.memoData.id] !== undefined) continue; 
                         
-                        for (let i = 0; i < cand.points.length; i++) {
-                            if (dist(cand.points[i].x, cand.points[i].y, currP.x, currP.y) < 2.0) {
-                                highlightAncestry[cand.memoData.id] = i; 
-                                currP = cand.points[0];
+                        for (let i = 0; i < potentialParent.points.length; i++) {
+                            if (dist(potentialParent.points[i].x, potentialParent.points[i].y, currP.x, currP.y) < 2.0) {
+                                highlightAncestry[potentialParent.memoData.id] = i; 
+                                currP = potentialParent.points[0];
                                 foundParent = true;
                                 break;
                             }
@@ -533,10 +573,8 @@ function draw() {
     push();
     translate(offsetX, offsetY);
 
-    // update branches
     for (let b of branchDroplets) b.update();
 
-    // render base view for the overlay (Two-pass to ensure 'myPos' branches render on top)
     for (let b of branchDroplets) {
         if (b.memoData && b.memoData.slot !== myPos) b.displayBase(false);
     }
@@ -544,9 +582,8 @@ function draw() {
         if (b.memoData && b.memoData.slot === myPos) b.displayBase(false);
     }
 
-    // visible river scope
-    let viewTop = camY - height / 2;
-    let viewBottom = camY + height / 2;
+    let viewTop = viewCenterY - height / 2;
+    let viewBottom = viewCenterY + height / 2;
     let firstVisible = 0;
     let lastVisible = slotPoses.length - 1;
     
@@ -573,17 +610,16 @@ function draw() {
         if (b.memoData) b.displayHighlight();
     }
 
-   // icon pose
     let sumX = 0, sumY = 0;
     let farthestDist = -1;
-    let leafCount = 0;
+    let branchCount = 0;
     let allFinished = true;
     let slotCenterForIcon = slotPoses[myPos - 1];
 
     for (let b of branchDroplets) {
         if (b.memoData && b.memoData.slot === myPos && b.points.length > 0) {
             if (!b.isFinished) allFinished = false;
-            leafCount++;
+            branchCount++;
             let lastP = b.points[b.points.length - 1];
             sumX += lastP.x;
             sumY += lastP.y;
@@ -594,29 +630,29 @@ function draw() {
         }
     }
 
-    if (leafCount > 0) {
+    if (branchCount > 0) {
         if (allFinished && slotCenterForIcon && farthestDist > 0) {
-            let centroidX = sumX / leafCount;
-            let centroidY = sumY / leafCount;
+            let centroidX = sumX / branchCount;
+            let centroidY = sumY / branchCount;
 
             let dx = centroidX - slotCenterForIcon.x;
             let dy = centroidY - slotCenterForIcon.y;
             let centroidDist = dist(slotCenterForIcon.x, slotCenterForIcon.y, centroidX, centroidY);
 
-            let idealX, idealY;
+            let targetIconX, targetIconY;
             if (centroidDist > 0) {
-                idealX = slotCenterForIcon.x + (dx / centroidDist) * farthestDist;
-                idealY = slotCenterForIcon.y + (dy / centroidDist) * farthestDist;
+                targetIconX = slotCenterForIcon.x + (dx / centroidDist) * farthestDist;
+                targetIconY = slotCenterForIcon.y + (dy / centroidDist) * farthestDist;
             } else {
-                idealX = slotCenterForIcon.x + farthestDist;
-                idealY = slotCenterForIcon.y;
+                targetIconX = slotCenterForIcon.x + farthestDist;
+                targetIconY = slotCenterForIcon.y;
             }
 
             let padX = 14, padY = 40; 
-            idealX = constrain(idealX, camX - width / 2 + padX, camX + width / 2 - padX);
-            idealY = constrain(idealY, camY - height / 2 + padY, camY + height / 2 - padY);
+            targetIconX = constrain(targetIconX, viewCenterX - width / 2 + padX, viewCenterX + width / 2 - padX);
+            targetIconY = constrain(targetIconY, viewCenterY - height / 2 + padY, viewCenterY + height / 2 - padY);
 
-            slotIconPositions[myPos] = { x: idealX, y: idealY };
+            slotIconPositions[myPos] = { x: targetIconX, y: targetIconY };
         }
 
         let idealPos = slotIconPositions[myPos];
@@ -668,7 +704,6 @@ function draw() {
         currentIconDispPos = null;
     }
 
-   //users (eyes)
     for (let id in users) {
         let isMe = (id === myUserId);
         let p = users[id];
@@ -676,8 +711,8 @@ function draw() {
         if (isNaN(n) || n < 1 || n > totalSlots || !slotPoses[n - 1]) continue;
 
         if (isMe) {
-            displayX[id] = camX;
-            displayY[id] = camY;
+            displayX[id] = viewCenterX;
+            displayY[id] = viewCenterY;
         } else {
             if (userFloatPos[id] === undefined) {
                 userFloatPos[id] = n;
@@ -744,7 +779,6 @@ function draw() {
     }
     pop();
 
-    // overlay mask
     let isReadOpen = !readOverlay.classList.contains("hidden");
     let isComposeOpen = !composeOverlay.classList.contains("hidden");
 
@@ -770,7 +804,6 @@ function draw() {
     }
 }
 
-//river system
 function drawRiverSystem(isOverlay, firstVisible, lastVisible, stageStartIdx, stageEndIdx) {
     if (isOverlay) {
         stroke(99, 167, 250);
@@ -948,13 +981,13 @@ class BranchDroplet {
             else stroke(225, 240, 255); 
         }
 
-        let hlIdx = highlightAncestry[this.memoData.id];
+        let highlightIndex = highlightAncestry[this.memoData.id];
 
         strokeWeight(2);
         beginShape();
-        if (hlIdx !== undefined) {
-            if (hlIdx < this.points.length - 1) {
-                for (let i = hlIdx; i < this.points.length; i++) {
+        if (highlightIndex !== undefined) {
+            if (highlightIndex < this.points.length - 1) {
+                for (let i = highlightIndex; i < this.points.length; i++) {
                     vertex(this.points[i].x, this.points[i].y);
                 }
             }
@@ -965,13 +998,13 @@ class BranchDroplet {
     }
 
     displayHighlight() {
-        let hlIdx = highlightAncestry[this.memoData.id];
-        if (hlIdx !== undefined) {
+        let highlightIndex = highlightAncestry[this.memoData.id];
+        if (highlightIndex !== undefined) {
             noFill();
             stroke(10, 40, 180); 
             strokeWeight(2);
             beginShape();
-            for (let i = 0; i <= hlIdx; i++) {
+            for (let i = 0; i <= highlightIndex; i++) {
                 vertex(this.points[i].x, this.points[i].y);
             }
             endShape();
@@ -979,7 +1012,12 @@ class BranchDroplet {
     }
 }
 
+let lastWinWidth = window.innerWidth;
+
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    rebuildBranches();
+    if (window.innerWidth !== lastWinWidth) {
+        resizeCanvas(windowWidth, windowHeight);
+        rebuildBranches();
+        lastWinWidth = window.innerWidth;
+    }
 }
