@@ -25,6 +25,21 @@ function getOrCreateUserId() {
 }
 let myUserId = getOrCreateUserId();
 
+// ── Auto-scroll (demo device) ──────────────────────────────────────────────
+// 在浏览器控制台运行以下命令来开启自动滚动：
+//   localStorage.setItem("imariver-autoscroll", "true")
+// 运行以下命令来关闭：
+//   localStorage.removeItem("imariver-autoscroll")
+const AUTO_SCROLL_KEY = "imariver-autoscroll";
+const isAutoScroll = localStorage.getItem(AUTO_SCROLL_KEY) === "true";
+
+let autoScrollFloat = null;
+let autoScrollDir = 1;         // 1 = 向前(1→1000), -1 = 向后(1000→1)
+const AUTO_SCROLL_SPEED = 0.4; // 每帧前进的slot数，调小更慢，调大更快
+                                // 0.4 ≈ 每秒24个slot，单程约42秒
+                                // 0.1 ≈ 每秒6个slot，单程约170秒
+                                // 1.0 ≈ 每秒60个slot，单程约17秒
+
 //socket io communication setup
 let socket;
 if (location.hostname.toLowerCase().startsWith('browsercircus') ||
@@ -374,6 +389,9 @@ let swipeAnchorY = 0;
 const swipeUnit = 24;
 
 function touchStarted() {
+    // 自动滚动模式下禁用触摸交互
+    if (isAutoScroll) return false;
+
     if (!composeOverlay.classList.contains("hidden") || !readOverlay.classList.contains("hidden")) {
         return; 
     }
@@ -390,6 +408,9 @@ function touchStarted() {
 }
 
 function touchMoved() {
+    // 自动滚动模式下禁用触摸交互
+    if (isAutoScroll) return false;
+
     if (!composeOverlay.classList.contains("hidden") || !readOverlay.classList.contains("hidden")) {
         return; 
     }
@@ -418,6 +439,9 @@ function touchMoved() {
 }
 
 function touchEnded() {
+    // 自动滚动模式下禁用触摸交互
+    if (isAutoScroll) return false;
+
     if (!composeOverlay.classList.contains("hidden") || !readOverlay.classList.contains("hidden")) {
         return; 
     }
@@ -524,10 +548,36 @@ function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
     canvas.parent("p5-canvas-container");
     textFont("sans-serif");
+
+    // 初始化自动滚动起始位置
+    if (isAutoScroll) {
+        let startPos = (myPos && !isNaN(myPos)) ? myPos : 1;
+        autoScrollFloat = startPos;
+    }
 }
 
 function draw() {
     background(255);
+
+    // ── 自动滚动逻辑 ──────────────────────────────────────────────────────
+    if (isAutoScroll && autoScrollFloat !== null && slotPoses.length > 0) {
+        // deltaTime 单位为毫秒，归一化到60fps使速度帧率无关
+        autoScrollFloat += AUTO_SCROLL_SPEED * autoScrollDir * (deltaTime / 1000) * 60;
+
+        if (autoScrollFloat >= totalSlots) {
+            autoScrollFloat = totalSlots;
+            autoScrollDir = -1; // 到达终点，掉头向回
+        } else if (autoScrollFloat <= 1) {
+            autoScrollFloat = 1;
+            autoScrollDir = 1;  // 到达起点，掉头向前
+        }
+
+        let newPos = Math.round(autoScrollFloat);
+        if (newPos !== myPos) {
+            changeMyPos(newPos);
+        }
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     updateCanvasCenter();
     let viewCenterX = getCanvasCenterX();
