@@ -35,7 +35,7 @@ const isAutoScroll = localStorage.getItem(AUTO_SCROLL_KEY) === "true";
 
 let autoScrollFloat = null;
 let autoScrollDir = 1;         // 1 = 向前(1→1000), -1 = 向后(1000→1)
-const AUTO_SCROLL_SPEED = 0.4; // 每帧前进的slot数，调小更慢，调大更快
+const AUTO_SCROLL_SPEED = 0.01; // 每帧前进的slot数，调小更慢，调大更快
                                 // 0.4 ≈ 每秒24个slot，单程约42秒
                                 // 0.1 ≈ 每秒6个slot，单程约170秒
                                 // 1.0 ≈ 每秒60个slot，单程约17秒
